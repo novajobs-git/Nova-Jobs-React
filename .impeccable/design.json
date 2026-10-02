@@ -1,0 +1,528 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-29T00:00:00Z",
+  "title": "Design System: NovaJobs",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Signal Blue",
+        "canonical": "#3b82f6",
+        "dark": "#3b82f6",
+        "tonalRamp": [
+          "#1e3a8a",
+          "#1e40af",
+          "#1d4ed8",
+          "#2563eb",
+          "#3b82f6",
+          "#60a5fa",
+          "#93c5fd",
+          "#dbeafe"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Pressed Blue",
+        "canonical": "#2563eb",
+        "dark": "#60a5fa",
+        "tonalRamp": [
+          "#1e3a8a",
+          "#1e40af",
+          "#1d4ed8",
+          "#2563eb",
+          "#3b82f6",
+          "#60a5fa",
+          "#93c5fd",
+          "#dbeafe"
+        ]
+      },
+      "primary-foreground": {
+        "role": "primary",
+        "displayName": "Label White",
+        "canonical": "oklch(0.99 0 0)",
+        "dark": "oklch(0.99 0 0)",
+        "tonalRamp": [
+          "oklch(0.15 0 0)",
+          "oklch(0.27 0 0)",
+          "oklch(0.39 0 0)",
+          "oklch(0.51 0 0)",
+          "oklch(0.63 0 0)",
+          "oklch(0.75 0 0)",
+          "oklch(0.87 0 0)",
+          "oklch(0.99 0 0)"
+        ]
+      },
+      "warning": {
+        "role": "secondary",
+        "displayName": "In-Progress Blue",
+        "canonical": "#2563eb",
+        "dark": "#60a5fa",
+        "note": "Named --warning by ui-context; carries the Applying state, not caution.",
+        "tonalRamp": [
+          "#1e3a8a",
+          "#1e40af",
+          "#1d4ed8",
+          "#2563eb",
+          "#3b82f6",
+          "#60a5fa",
+          "#93c5fd",
+          "#dbeafe"
+        ]
+      },
+      "success": {
+        "role": "secondary",
+        "displayName": "Applied Green",
+        "canonical": "#16a34a",
+        "dark": "#22c55e",
+        "tonalRamp": [
+          "#14532d",
+          "#166534",
+          "#15803d",
+          "#16a34a",
+          "#22c55e",
+          "#4ade80",
+          "#86efac",
+          "#dcfce7"
+        ]
+      },
+      "success-text": {
+        "role": "secondary",
+        "displayName": "Applied Green, Text",
+        "canonical": "#15803d",
+        "dark": "#22c55e",
+        "tonalRamp": [
+          "#14532d",
+          "#166534",
+          "#15803d",
+          "#16a34a",
+          "#22c55e",
+          "#4ade80",
+          "#86efac",
+          "#dcfce7"
+        ]
+      },
+      "needs-review": {
+        "role": "secondary",
+        "displayName": "Review Coral",
+        "canonical": "#f87171",
+        "dark": "#fca5a5",
+        "note": "Fill only; never text.",
+        "tonalRamp": [
+          "#7f1d1d",
+          "#991b1b",
+          "#b91c1c",
+          "#dc2626",
+          "#ef4444",
+          "#f87171",
+          "#fca5a5",
+          "#fee2e2"
+        ]
+      },
+      "destructive": {
+        "role": "secondary",
+        "displayName": "Failure Red",
+        "canonical": "#dc2626",
+        "dark": "#f87171",
+        "tonalRamp": [
+          "#7f1d1d",
+          "#991b1b",
+          "#b91c1c",
+          "#dc2626",
+          "#ef4444",
+          "#f87171",
+          "#fca5a5",
+          "#fee2e2"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "oklch(1 0 0)",
+        "dark": "oklch(0.17 0.012 255)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 255)",
+          "oklch(0.27 0.012 255)",
+          "oklch(0.39 0.012 255)",
+          "oklch(0.51 0.012 255)",
+          "oklch(0.63 0.01 255)",
+          "oklch(0.75 0.008 255)",
+          "oklch(0.87 0.006 255)",
+          "oklch(0.97 0.004 255)"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(0.21 0.015 255)",
+        "dark": "oklch(0.96 0.005 255)",
+        "tonalRamp": [
+          "oklch(0.15 0.015 255)",
+          "oklch(0.27 0.015 255)",
+          "oklch(0.39 0.015 255)",
+          "oklch(0.51 0.014 255)",
+          "oklch(0.63 0.012 255)",
+          "oklch(0.75 0.01 255)",
+          "oklch(0.87 0.007 255)",
+          "oklch(0.95 0.005 255)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Mist",
+        "canonical": "oklch(0.967 0.004 255)",
+        "dark": "oklch(0.26 0.014 255)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 255)",
+          "oklch(0.27 0.012 255)",
+          "oklch(0.39 0.012 255)",
+          "oklch(0.51 0.012 255)",
+          "oklch(0.63 0.01 255)",
+          "oklch(0.75 0.008 255)",
+          "oklch(0.87 0.006 255)",
+          "oklch(0.967 0.004 255)"
+        ]
+      },
+      "muted-foreground": {
+        "role": "neutral",
+        "displayName": "Slate Text",
+        "canonical": "oklch(0.5 0.015 255)",
+        "dark": "oklch(0.72 0.012 255)",
+        "tonalRamp": [
+          "oklch(0.15 0.015 255)",
+          "oklch(0.27 0.015 255)",
+          "oklch(0.39 0.015 255)",
+          "oklch(0.5 0.015 255)",
+          "oklch(0.63 0.012 255)",
+          "oklch(0.75 0.01 255)",
+          "oklch(0.87 0.007 255)",
+          "oklch(0.95 0.005 255)"
+        ]
+      },
+      "accent": {
+        "role": "neutral",
+        "displayName": "Frost",
+        "canonical": "oklch(0.955 0.012 255)",
+        "dark": "oklch(0.27 0.02 255)",
+        "tonalRamp": [
+          "oklch(0.15 0.02 255)",
+          "oklch(0.27 0.02 255)",
+          "oklch(0.39 0.02 255)",
+          "oklch(0.51 0.018 255)",
+          "oklch(0.63 0.016 255)",
+          "oklch(0.75 0.014 255)",
+          "oklch(0.87 0.012 255)",
+          "oklch(0.955 0.012 255)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(0.925 0.006 255)",
+        "dark": "oklch(1 0 0 / 9%)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 255)",
+          "oklch(0.27 0.006 255)",
+          "oklch(0.39 0.006 255)",
+          "oklch(0.51 0.006 255)",
+          "oklch(0.63 0.006 255)",
+          "oklch(0.75 0.006 255)",
+          "oklch(0.87 0.006 255)",
+          "oklch(0.925 0.006 255)"
+        ]
+      },
+      "input": {
+        "role": "neutral",
+        "displayName": "Field Line",
+        "canonical": "oklch(0.9 0.008 255)",
+        "dark": "oklch(1 0 0 / 14%)",
+        "tonalRamp": [
+          "oklch(0.15 0.008 255)",
+          "oklch(0.27 0.008 255)",
+          "oklch(0.39 0.008 255)",
+          "oklch(0.51 0.008 255)",
+          "oklch(0.63 0.008 255)",
+          "oklch(0.75 0.008 255)",
+          "oklch(0.87 0.008 255)",
+          "oklch(0.95 0.006 255)"
+        ]
+      },
+      "sidebar": {
+        "role": "neutral",
+        "displayName": "Rail",
+        "canonical": "oklch(0.982 0.004 255)",
+        "dark": "oklch(0.19 0.012 255)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 255)",
+          "oklch(0.27 0.012 255)",
+          "oklch(0.39 0.012 255)",
+          "oklch(0.51 0.01 255)",
+          "oklch(0.63 0.008 255)",
+          "oklch(0.75 0.006 255)",
+          "oklch(0.87 0.005 255)",
+          "oklch(0.982 0.004 255)"
+        ]
+      },
+      "sidebar-accent": {
+        "role": "neutral",
+        "displayName": "Rail Selected",
+        "canonical": "oklch(0.945 0.012 255)",
+        "dark": "oklch(0.25 0.016 255)",
+        "tonalRamp": [
+          "oklch(0.15 0.016 255)",
+          "oklch(0.27 0.016 255)",
+          "oklch(0.39 0.016 255)",
+          "oklch(0.51 0.015 255)",
+          "oklch(0.63 0.014 255)",
+          "oklch(0.75 0.013 255)",
+          "oklch(0.87 0.012 255)",
+          "oklch(0.945 0.012 255)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page title, one per route."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "Headline counts in the outcome legend; tabular."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Rows, reasons, descriptions; reasons cap at 75ch. Page lede steps up to 1rem."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, status labels, role names, tab triggers."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Relative timestamps, queue position, truncated table reasons; tabular."
+      }
+    },
+    "shadows": [
+      {
+        "name": "control-xs",
+        "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        "purpose": "Outline buttons, inputs, select triggers (shadcn primitive default)."
+      },
+      {
+        "name": "tab-active-sm",
+        "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "purpose": "Active tab trigger lifted off the Mist track."
+      },
+      {
+        "name": "menu-md",
+        "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        "purpose": "Select and dropdown menus."
+      },
+      {
+        "name": "sheet-lg",
+        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "purpose": "Workbench bottom sheet only."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-200",
+        "value": "200ms ease-in-out",
+        "purpose": "Outcome-bar dimming, sheet slide-in from bottom (10 units) with fade."
+      },
+      {
+        "name": "overlay-100",
+        "value": "100ms",
+        "purpose": "Sheet overlay fade."
+      },
+      {
+        "name": "applying-ping",
+        "value": "animate-ping (1s cubic-bezier(0, 0, 0.2, 1) infinite)",
+        "purpose": "Live dot while a job is applying; disabled under prefers-reduced-motion."
+      },
+      {
+        "name": "scroll-to-history",
+        "value": "smooth, or auto under prefers-reduced-motion",
+        "purpose": "Outcome-bar selection scrolls to the history table."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ],
+    "radiusBase": {
+      "name": "--radius",
+      "value": "6px",
+      "scale": {
+        "sm": "3.6px",
+        "md": "4.8px",
+        "lg": "6px",
+        "xl": "8.4px",
+        "2xl": "10.8px"
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one resolving action per row: Retry, Answer question, Update profile.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Retry</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 10px; border-radius: var(--radius, 6px); border: 1px solid transparent; font: 500 14px/20px Inter, system-ui, sans-serif; cursor: pointer; transition: all 150ms; } .ds-btn:focus-visible { outline: none; border-color: var(--ring, #3b82f6); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring, #3b82f6) 50%, transparent); } .ds-btn:active { transform: translateY(1px); } .ds-btn-primary { background: var(--primary, #3b82f6); color: var(--primary-foreground, #fcfcfc); } .ds-btn-primary:hover { background: var(--primary-hover, #2563eb); }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Low-stakes actions: Dismiss, Clear filters.",
+      "html": "<button class=\"ds-btn-outline\">Dismiss</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; height: 32px; padding: 0 10px; border-radius: var(--radius, 6px); border: 1px solid var(--border, oklch(0.925 0.006 255)); background: var(--background, #fff); color: var(--foreground, oklch(0.21 0.015 255)); box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); font: 500 14px/20px Inter, system-ui, sans-serif; cursor: pointer; transition: all 150ms; } .ds-btn-outline:hover { background: var(--muted, oklch(0.967 0.004 255)); } .ds-btn-outline:focus-visible { outline: none; border-color: var(--ring, #3b82f6); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring, #3b82f6) 50%, transparent); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary links and toggles: Posting, Show all.",
+      "html": "<button class=\"ds-btn-ghost\">Posting <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 3h6v6\"/><path d=\"M10 14 21 3\"/><path d=\"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6\"/></svg></button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 6px 0 10px; border-radius: var(--radius, 6px); border: 1px solid transparent; background: transparent; color: var(--foreground, oklch(0.21 0.015 255)); font: 500 14px/20px Inter, system-ui, sans-serif; cursor: pointer; transition: all 150ms; } .ds-btn-ghost:hover { background: var(--muted, oklch(0.967 0.004 255)); } .ds-btn-ghost:focus-visible { outline: none; border-color: var(--ring, #3b82f6); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring, #3b82f6) 50%, transparent); }"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Filter field with a leading lucide search icon.",
+      "html": "<label class=\"ds-search\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"/><circle cx=\"11\" cy=\"11\" r=\"8\"/></svg><input class=\"ds-input\" placeholder=\"Company or role\" aria-label=\"Search company or role\"></label>",
+      "css": ".ds-search { position: relative; display: block; width: 256px; } .ds-search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted-foreground, oklch(0.5 0.015 255)); pointer-events: none; } .ds-input { width: 100%; height: 36px; padding: 4px 10px 4px 32px; border-radius: calc(var(--radius, 6px) * 0.8); border: 1px solid var(--input, oklch(0.9 0.008 255)); background: transparent; color: var(--foreground, oklch(0.21 0.015 255)); box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); font: 400 14px/20px Inter, system-ui, sans-serif; outline: none; transition: color 150ms, box-shadow 150ms; } .ds-input::placeholder { color: var(--muted-foreground, oklch(0.5 0.015 255)); } .ds-input:focus-visible { border-color: var(--ring, #3b82f6); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring, #3b82f6) 50%, transparent); }"
+    },
+    {
+      "name": "Tabs with Counts",
+      "kind": "chip",
+      "refersTo": "tabs-list",
+      "description": "Mist track; active trigger lifts to Paper; every trigger carries a tabular count badge.",
+      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button class=\"ds-tab\" role=\"tab\" aria-selected=\"true\">All <span class=\"ds-count\">42</span></button><button class=\"ds-tab\" role=\"tab\" aria-selected=\"false\">Applied <span class=\"ds-count\">28</span></button><button class=\"ds-tab\" role=\"tab\" aria-selected=\"false\">Failed <span class=\"ds-count\">6</span></button></div>",
+      "css": ".ds-tabs { display: inline-flex; align-items: center; height: 36px; padding: 3px; border-radius: var(--radius, 6px); background: var(--muted, oklch(0.967 0.004 255)); } .ds-tab { display: inline-flex; align-items: center; gap: 6px; height: calc(100% - 1px); padding: 4px 8px; border: 1px solid transparent; border-radius: calc(var(--radius, 6px) * 0.8); background: transparent; color: color-mix(in oklch, var(--foreground, oklch(0.21 0.015 255)) 60%, transparent); font: 500 14px/20px Inter, system-ui, sans-serif; cursor: pointer; transition: all 150ms; } .ds-tab:hover { color: var(--foreground, oklch(0.21 0.015 255)); } .ds-tab[aria-selected=\"true\"] { background: var(--background, #fff); color: var(--foreground, oklch(0.21 0.015 255)); box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); } .ds-tab:focus-visible { outline: 1px solid var(--ring, #3b82f6); box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring, #3b82f6) 50%, transparent); } .ds-count { display: inline-flex; align-items: center; height: 18px; padding: 0 6px; border-radius: 9999px; background: var(--secondary, oklch(0.967 0.004 255)); color: var(--secondary-foreground, oklch(0.27 0.015 255)); font: 500 12px/16px Inter, system-ui, sans-serif; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Status Label",
+      "kind": "custom",
+      "refersTo": "status-label",
+      "description": "Color plus word plus lucide icon; the reusable unit for every status.",
+      "html": "<div class=\"ds-status-set\"><span class=\"ds-status ds-status-applied\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m9 12 2 2 4-4\"/></svg>Applied</span><span class=\"ds-status ds-status-applying\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"/></svg>Applying</span><span class=\"ds-status ds-status-review\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><line x1=\"12\" x2=\"12\" y1=\"8\" y2=\"12\"/><line x1=\"12\" x2=\"12.01\" y1=\"16\" y2=\"16\"/></svg>Needs review</span><span class=\"ds-status ds-status-failed\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m15 9-6 6\"/><path d=\"m9 9 6 6\"/></svg>Failed</span></div>",
+      "css": ".ds-status-set { display: flex; flex-direction: column; gap: 8px; } .ds-status { display: inline-flex; align-items: center; gap: 6px; font: 500 14px/20px Inter, system-ui, sans-serif; } .ds-status-applied { color: var(--success-text, #15803d); } .ds-status-applying { color: var(--warning, #2563eb); } .ds-status-review, .ds-status-failed { color: var(--destructive, #dc2626); }"
+    },
+    {
+      "name": "Outcome Bar",
+      "kind": "custom",
+      "refersTo": "outcome-bar",
+      "description": "Proportional status-fill pill with a tabular legend; selecting filters history.",
+      "html": "<div class=\"ds-outcome\"><div class=\"ds-outcome-bar\"><span style=\"flex-grow:28;background:var(--success,#16a34a)\"></span><span style=\"flex-grow:4;background:var(--primary,#3b82f6)\"></span><span style=\"flex-grow:4;background:var(--needs-review,#f87171)\"></span><span style=\"flex-grow:6;background:var(--destructive,#dc2626)\"></span></div><div class=\"ds-outcome-legend\"><button class=\"ds-legend\"><span class=\"ds-legend-label\"><i style=\"background:var(--success,#16a34a)\"></i>Applied</span><span class=\"ds-legend-num\">28 <small>67%</small></span></button><button class=\"ds-legend\"><span class=\"ds-legend-label\"><i style=\"background:var(--destructive,#dc2626)\"></i>Failed</span><span class=\"ds-legend-num\">6 <small>14%</small></span></button></div></div>",
+      "css": ".ds-outcome { width: 100%; max-width: 560px; } .ds-outcome-bar { display: flex; gap: 2px; height: 12px; border-radius: 9999px; overflow: hidden; } .ds-outcome-bar span { flex-basis: 0; min-width: 6px; transition: opacity 200ms; } .ds-outcome-bar span:hover { opacity: 0.8; } .ds-outcome-legend { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 24px; margin-top: 16px; } .ds-legend { display: flex; flex-direction: column; align-items: flex-start; margin: -8px; padding: 8px; border: 0; border-radius: calc(var(--radius, 6px) * 0.8); background: transparent; text-align: left; cursor: pointer; transition: background 150ms; } .ds-legend:hover { background: color-mix(in oklch, var(--muted, oklch(0.967 0.004 255)) 70%, transparent); } .ds-legend:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring, #3b82f6) 50%, transparent); } .ds-legend-label { display: flex; align-items: center; gap: 8px; font: 400 14px/20px Inter, system-ui, sans-serif; color: var(--muted-foreground, oklch(0.5 0.015 255)); } .ds-legend-label i { width: 10px; height: 10px; border-radius: 9999px; } .ds-legend-num { margin-top: 4px; font: 600 24px/32px Inter, system-ui, sans-serif; letter-spacing: -0.025em; font-variant-numeric: tabular-nums; color: var(--foreground, oklch(0.21 0.015 255)); } .ds-legend-num small { font: 400 14px/20px Inter, system-ui, sans-serif; letter-spacing: 0; color: var(--muted-foreground, oklch(0.5 0.015 255)); }"
+    },
+    {
+      "name": "Attention Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Hairline-bordered panel with a ruled header and divided rows; no shadow.",
+      "html": "<section class=\"ds-panel\"><header class=\"ds-panel-head\"><h2>Needs your attention</h2></header><div class=\"ds-panel-row\"><div><p class=\"ds-role\">Software Engineer, Patient Apps <span>· Halcyon Health</span></p><p class=\"ds-reason\">CAPTCHA wasn't completed after 3 attempts. Nothing was submitted.</p></div><button class=\"ds-panel-btn\">Retry</button></div></section>",
+      "css": ".ds-panel { border: 1px solid var(--border, oklch(0.925 0.006 255)); border-radius: var(--radius, 6px); background: var(--background, #fff); max-width: 640px; } .ds-panel-head { padding: 12px 20px; border-bottom: 1px solid var(--border, oklch(0.925 0.006 255)); } .ds-panel-head h2 { margin: 0; font: 600 16px/24px Inter, system-ui, sans-serif; color: var(--foreground, oklch(0.21 0.015 255)); } .ds-panel-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 20px; } .ds-panel-row:hover { background: color-mix(in oklch, var(--muted, oklch(0.967 0.004 255)) 50%, transparent); } .ds-role { margin: 0; font: 500 14px/20px Inter, system-ui, sans-serif; color: var(--foreground, oklch(0.21 0.015 255)); } .ds-role span { font-weight: 400; color: var(--muted-foreground, oklch(0.5 0.015 255)); } .ds-reason { margin: 4px 0 0; max-width: 75ch; font: 400 14px/20px Inter, system-ui, sans-serif; color: color-mix(in oklch, var(--foreground, oklch(0.21 0.015 255)) 80%, transparent); } .ds-panel-btn { height: 32px; padding: 0 10px; border: 0; border-radius: calc(var(--radius, 6px) * 0.8); background: var(--primary, #3b82f6); color: var(--primary-foreground, #fcfcfc); font: 500 14px/20px Inter, system-ui, sans-serif; cursor: pointer; } .ds-panel-btn:hover { background: var(--primary-hover, #2563eb); } .ds-panel-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring, #3b82f6) 50%, transparent); }"
+    },
+    {
+      "name": "Workbench Dock Bar",
+      "kind": "nav",
+      "refersTo": "workbench-dock",
+      "description": "Sticky translucent bottom bar showing the job applying now; opens the queue sheet.",
+      "html": "<button class=\"ds-dock\"><span class=\"ds-dock-dot\"></span><span class=\"ds-dock-text\"><b>Applying now:</b> Senior Frontend Engineer <span>· Copperleaf Software</span></span><span class=\"ds-dock-meta\">3 queued next</span><span class=\"ds-dock-cta\">Workbench <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m18 15-6-6-6 6\"/></svg></span></button>",
+      "css": ".ds-dock { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 24px; border: 0; border-top: 1px solid var(--border, oklch(0.925 0.006 255)); background: color-mix(in oklch, var(--background, #fff) 80%, transparent); backdrop-filter: blur(8px); text-align: left; cursor: pointer; font: 400 14px/20px Inter, system-ui, sans-serif; color: var(--foreground, oklch(0.21 0.015 255)); transition: background 150ms; } .ds-dock:hover, .ds-dock:focus-visible { outline: none; background: color-mix(in oklch, var(--muted, oklch(0.967 0.004 255)) 60%, transparent); } .ds-dock-dot { width: 10px; height: 10px; border-radius: 9999px; background: var(--warning, #2563eb); flex-shrink: 0; box-shadow: 0 0 0 3px color-mix(in oklch, var(--warning, #2563eb) 25%, transparent); } .ds-dock-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-dock-text b { font-weight: 500; } .ds-dock-text span, .ds-dock-meta { color: var(--muted-foreground, oklch(0.5 0.015 255)); } .ds-dock-meta { font-variant-numeric: tabular-nums; } .ds-dock-cta { display: inline-flex; align-items: center; gap: 4px; font-weight: 500; color: var(--primary, #3b82f6); }"
+    },
+    {
+      "name": "Sidebar Nav Item",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Icon plus label on the Rail; active on Rail Selected; attention count in red.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item\" aria-current=\"page\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\"/><path d=\"m21.854 2.147-10.94 10.939\"/></svg>Applications<span class=\"ds-nav-badge\">10</span></a><a class=\"ds-nav-item\" aria-disabled=\"true\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16\"/><rect width=\"20\" height=\"14\" x=\"2\" y=\"6\" rx=\"2\"/></svg>Jobs<span class=\"ds-nav-soon\">Soon</span></a></nav>",
+      "css": ".ds-nav { display: flex; flex-direction: column; gap: 4px; width: 240px; padding: 8px; background: var(--sidebar, oklch(0.982 0.004 255)); } .ds-nav-item { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 8px; border-radius: calc(var(--radius, 6px) * 0.8); font: 400 14px/20px Inter, system-ui, sans-serif; color: var(--sidebar-foreground, oklch(0.27 0.015 255)); text-decoration: none; transition: background 150ms; } .ds-nav-item:hover { background: var(--sidebar-accent, oklch(0.945 0.012 255)); } .ds-nav-item:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--sidebar-ring, #3b82f6); } .ds-nav-item[aria-current=\"page\"] { background: var(--sidebar-accent, oklch(0.945 0.012 255)); color: var(--sidebar-accent-foreground, oklch(0.21 0.015 255)); font-weight: 500; } .ds-nav-item[aria-disabled=\"true\"] { opacity: 0.5; } .ds-nav-badge, .ds-nav-soon { margin-left: auto; font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; } .ds-nav-badge { color: var(--destructive, #dc2626); } .ds-nav-soon { font-weight: 400; color: var(--muted-foreground, oklch(0.5 0.015 255)); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Honest Ledger",
+    "overview": "NovaJobs is an operating surface a job seeker checks every day, so the system reads like a well-kept ledger: white paper, cool-grey rules, one blue for action, and three status colors that always mean the same thing. It is shadcn/ui (radix-vega primitives) on Inter at hue-255 cool-tinted neutrals. Density is data-dense but calm, with 14px body text, hairline-divided rows, and tabular numerals everywhere a number appears.\n\nHierarchy comes from weight and position, not ornament. Sections are hairline-bordered panels, not raised cards. Status is never carried by color alone: it is always color, word, and a lucide icon together. The status palette is the product's promise that every attempt ends in a real submission or a stated reason, so it is exact and never reused for decoration.\n\nLight and dark themes are both first-class, switched by class (`.dark`) through the same CSS custom properties. Dark mode lifts the status hues one step (green 500, red 400) so they stay legible on the near-black blue-grey ground.",
+    "keyCharacteristics": [
+      "One blue (`--primary`) for actions, links, and the in-progress state; no second accent hue.",
+      "Status triad: green applied, blue queued/applying, red failed or needs review, each paired with a label and icon.",
+      "Cool neutrals at OKLCH hue 255, very low chroma, never pure grey.",
+      "Flat panels on 1px hairlines at a 6px radius; shadows only on floating overlays and form controls.",
+      "Inter throughout, Tailwind's default type scale, tabular numerals for every count, percent, and timestamp."
+    ],
+    "rules": [
+      {
+        "name": "The Triple-Signal Status Rule",
+        "body": "Every status renders as color plus its word plus its lucide icon (CircleCheck applied, LoaderCircle applying, CircleDashed queued, CircleAlert needs review, CircleX failed). A colored dot alone is allowed only where the word sits beside it in a legend.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fill-Versus-Text Rule",
+        "body": "Status fills and status text are separate tokens. Green text uses `success-text`, never `success`. Review Coral is never used for text; Needs-review text is Failure Red.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Blue Rule",
+        "body": "Blue means \"act here\" or \"in progress\". Do not introduce another accent hue, and do not use status colors for decoration, section theming, or emphasis.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Numerals Rule",
+        "body": "Every count, percentage, match score, and timestamp is set with tabular figures so columns and legends do not jitter as data changes.",
+        "section": "typography"
+      },
+      {
+        "name": "The Default Scale Rule",
+        "body": "Sizes come from Tailwind's default scale only. No per-component font sizes.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hairline Rule",
+        "body": "Content containers are bordered, never shadowed. Only floating layers (sheet, popover, menu) cast a real shadow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Derived Radius Rule",
+        "body": "Radii come from the `--radius` scale. Never type a one-off radius into a component.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** pair every status color with its word and its lucide icon (The Triple-Signal Status Rule).",
+      "**Do** use `success-text` for green text and `success` for green fills; use Failure Red for all Needs-review text.",
+      "**Do** set every number in tabular figures.",
+      "**Do** separate content with 1px Hairline borders and dividers at the 6px radius.",
+      "**Do** reference color only through the CSS custom properties; component code carries no hex values.",
+      "**Do** keep the Workbench sheet to the right of the sidebar edge.",
+      "**Do** respect `prefers-reduced-motion` for pulses and scroll-into-view."
+    ],
+    "donts": [
+      "**Don't** use Review Coral for text.",
+      "**Don't** add a second accent hue, or use status colors decoratively.",
+      "**Don't** put drop shadows on panels, tables, or list containers; shadows belong to floating layers.",
+      "**Don't** type one-off font sizes or radii into components.",
+      "**Don't** mix a second icon library into lucide-react."
+    ]
+  }
+}

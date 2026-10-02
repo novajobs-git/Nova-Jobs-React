@@ -1,0 +1,4 @@
+playwright>=1.48
+ats-scrapers>=0.3
+pandas>=2.2
+pyarrow>=17
