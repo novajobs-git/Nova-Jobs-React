@@ -97,6 +97,14 @@ export async function saveProfile(data: OnboardingData): Promise<void> {
   await writeFile(PROFILE_FILE, JSON.stringify(profile, null, 2), "utf8")
 }
 
+/** The resume builder's saved skills replace the parsed ones for matching. */
+export async function updateResumeSkills(skills: string[]): Promise<void> {
+  const profile = await getProfile()
+  if (!profile) throw new Error("Finish onboarding before saving a resume.")
+  const updated: StoredProfile = { ...profile, resume_skills: skills, updated_at: new Date().toISOString() }
+  await writeFile(PROFILE_FILE, JSON.stringify(updated, null, 2), "utf8")
+}
+
 export async function getProfile(): Promise<StoredProfile | null> {
   // The profile is per-candidate request data: never prerender a page from it.
   await connection()

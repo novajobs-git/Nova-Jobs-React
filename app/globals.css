@@ -49,6 +49,10 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-paper: var(--paper);
+  --color-paper-ink: var(--paper-ink);
+  --color-paper-muted: var(--paper-muted);
+  --color-paper-rule: var(--paper-rule);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -101,6 +105,11 @@
   --sidebar-accent-foreground: #2563eb;
   --sidebar-border: #e6eaf0;
   --sidebar-ring: #3b82f6;
+  /* The resume page stays white paper with dark ink in both themes; it prints. */
+  --paper: #ffffff;
+  --paper-ink: #0f172a;
+  --paper-muted: #475569;
+  --paper-rule: #cbd5e1;
 }
 
 .dark {
@@ -159,5 +168,25 @@
   }
   ::selection {
     @apply bg-primary/20 text-foreground;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="accordion-content"] {
+    animation: none;
+  }
+}
+
+/* Resume export: only the body-level copy rendered by ResumePreview prints. */
+@media print {
+  @page {
+    size: letter;
+    margin: 0.55in;
+  }
+  body > *:not([data-resume-print]) {
+    display: none !important;
+  }
+  body {
+    background: var(--paper);
   }
 }

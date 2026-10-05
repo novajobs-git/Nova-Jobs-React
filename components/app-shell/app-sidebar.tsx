@@ -20,7 +20,7 @@ const NAV = [
   { href: "/jobs", label: "Dashboard" },
   { href: null, label: "Jobs" },
   { href: "/applications", label: "Applications" },
-  { href: null, label: "Resume Builder" },
+  { href: "/resume", label: "Resume Builder" },
   { href: null, label: "Resume Analysis" },
   { href: null, label: "Settings" },
 ] as const

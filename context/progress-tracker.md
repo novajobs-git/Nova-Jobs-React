@@ -187,6 +187,12 @@ signatures so the UI doesn't change.
 - Added `PRODUCT.md` (Impeccable product record) and the Impeccable
   skill/hooks under `.claude/`. The dashboard's direction contract is in
   `.impeccable/surfaces/`.
+- `specs/009-resume-builder.md` done: `/resume` (sidebar "Resume
+  Builder") with live US Letter preview, Accordion section editor, Tiptap
+  rich text, three templates, suggest-then-accept "Write with AI"
+  (placeholder until Gemini), save to `data/resume/candidate.json`
+  (replaces `resume_skills`), PDF export via print. `/` now redirects to a
+  UI-only `/login` page (no auth until Clerk).
 
 ## In Progress
 
@@ -326,6 +332,12 @@ code is implemented.
 - **Mock data uses a fixed `DEMO_NOW`** so relative times match between
   server and client (no hydration mismatch). It is removed when real data
   lands.
+- **Resume builder defaults** (spec 009, taken from the confirmed brief):
+  three single-column templates (Classic, Compact, Modern), fixed section
+  order, rich text stored as Tiptap JSON and rendered as React (never
+  HTML), the resume paper uses its own template typography and `--paper*`
+  tokens (white in both themes), and saving replaces the profile's
+  `resume_skills`. The uploaded PDF is still what applications would send.
 
 ## Session Notes
 
@@ -366,3 +378,8 @@ code is implemented.
   fixed a Greenhouse description-extraction bug that leaked page CSS/JS
   into descriptions (caused nonsense matches). Schema/wiring specs
   renumbered to 007/008.
+- **2026-10-05** — Added a UI-only login page as the default route. Shaped
+  (Impeccable) and built the resume builder (spec 009, numbered after the
+  reserved 007/008). Seeding parses the uploaded resume's headings, dated
+  entry lines and wrapped bullets. User asked not to run typecheck/lint;
+  they test changes themselves.
