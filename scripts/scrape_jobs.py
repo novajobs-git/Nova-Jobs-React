@@ -2,7 +2,9 @@
 
 Boards come from the ats-scrapers company directory; jobs are read live from
 each board. Output: data/jobs/us-jobs.json (deduped by content hash, merged
-with previous runs). Supabase upsert replaces the file in spec 008.
+with previous runs), the one central pool every candidate is matched
+against. Each board's logo is downloaded into data/logos/ (spec 011).
+Supabase upsert replaces the files in spec 008.
 
 Run from the repo root:
     .venv\\Scripts\\python -m scripts.scrape_jobs --ats greenhouse lever --boards 20
@@ -20,6 +22,7 @@ from pathlib import Path
 
 from scripts.ats.boards import ATS, load_boards
 from scripts.ats.browser import browser_context
+from scripts.ats.logos import save_logo
 from scripts.ats.models import Board, ScrapedJob
 from scripts.ats.scrapers import SCRAPERS, BoardSkipped, board_logo, board_url, us_only
 
@@ -46,9 +49,11 @@ async def scrape_board(context, ats: str, board: Board, gate: asyncio.Semaphore,
         kept = us_only(jobs)
         stats["scraped"] += len(jobs)
         stats["non_us"] += len(jobs) - len(kept)
-        logo = await board_logo(context.request, ats, board_url(ats, board)) if kept else None
+        source = await board_logo(context.request, ats, board_url(ats, board)) if kept else None
+        logo = await save_logo(context.request, source) if source else None
         for job in kept:
             job.company_logo = logo
+            job.company_logo_source = source
         stats["logos"] += bool(logo)
         print(
             f"  [{board.ats}] {board.slug}: {len(jobs)} jobs, {len(kept)} US, "

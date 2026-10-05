@@ -17,6 +17,8 @@ export interface Application {
   /** The job in the shared pool this application is for. */
   jobId: string
   company: string
+  /** Copied from the job (spec 011); demo applications have none. */
+  companyLogo?: string
   role: string
   location: string
   ats: Ats

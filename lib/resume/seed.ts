@@ -8,32 +8,43 @@ import { bulletsDoc, emptyDoc, newId, paragraphsDoc, type ResumeDoc } from "./ty
  * Anything this misses starts empty for the candidate to fill in.
  */
 
-type SectionKey = "summary" | "experience" | "education" | "projects"
+export type SectionKey = "summary" | "experience" | "education" | "projects" | "skills"
 
 const HEADINGS: [RegExp, SectionKey][] = [
-  [/^(SUMMARY|PROFILE|PROFESSIONAL SUMMARY|OBJECTIVE|ABOUT( ME)?)$/, "summary"],
-  [/EXPERIENCE|EMPLOYMENT|WORK HISTORY/, "experience"],
-  [/EDUCATION/, "education"],
-  [/PROJECTS?/, "projects"],
+  [/^(SUMMARY|PROFILE|PROFESSIONAL SUMMARY|OBJECTIVE|ABOUT( ME)?)$/i, "summary"],
+  [/EXPERIENCE|EMPLOYMENT|WORK HISTORY/i, "experience"],
+  [/EDUCATION/i, "education"],
+  [/PROJECTS?/i, "projects"],
+  [/SKILLS|TECHNOLOGIES|TECHNICAL PROFICIENC/i, "skills"],
 ]
 
-const BULLET = /^[●•▪◦‣*-]\s*/
+export const BULLET = /^[●•▪◦‣*-]\s*/
 const MONTH = String.raw`(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+)?\d{4}`
-const DATE_RANGE = new RegExp(String.raw`\s*(${MONTH})\s*[–—-]\s*(${MONTH}|Present|Current|Now)\s*$`, "i")
+export const DATE_RANGE = new RegExp(String.raw`\s*(${MONTH})\s*[–—-]\s*(${MONTH}|Present|Current|Now)\s*$`, "i")
 
-interface Block {
+export interface Block {
   header: string | null
   bullets: string[]
 }
 
-function sectionsOf(text: string): Partial<Record<SectionKey, string[]>> {
+/** A heading line: CAPITALISED, or a short Title Case line that names a known section. */
+function headingKey(line: string): SectionKey | null | undefined {
+  const caps = /^[A-Z][A-Z &/]{2,40}$/.test(line)
+  const titled = /^[A-Z][A-Za-z &/]{2,40}$/.test(line) && line.split(/s+/).length <= 4
+  if (!caps && !titled) return undefined
+  const key = HEADINGS.find(([re]) => re.test(line))?.[1] ?? null
+  // Unknown Title Case lines are ordinary content (e.g. a school name), not headings.
+  return caps || key ? key : undefined
+}
+
+export function sectionsOf(text: string): Partial<Record<SectionKey, string[]>> {
   const out: Partial<Record<SectionKey, string[]>> = {}
   let current: string[] | null = null
   for (const raw of text.split("\n")) {
     const line = raw.trim()
     if (!line) continue
-    if (/^[A-Z][A-Z &/]{2,40}$/.test(line)) {
-      const key = HEADINGS.find(([re]) => re.test(line))?.[1]
+    const key = headingKey(line)
+    if (key !== undefined) {
       current = key ? (out[key] ??= []) : null
       continue
     }
@@ -42,7 +53,7 @@ function sectionsOf(text: string): Partial<Record<SectionKey, string[]>> {
   return out
 }
 
-function blocksOf(lines: string[]): Block[] {
+export function blocksOf(lines: string[]): Block[] {
   const blocks: Block[] = []
   for (const line of lines) {
     const last = blocks.at(-1)
@@ -60,7 +71,7 @@ function blocksOf(lines: string[]): Block[] {
   return blocks
 }
 
-function splitHeader(header: string, splitOnComma: boolean) {
+export function splitHeader(header: string, splitOnComma: boolean) {
   const range = header.match(DATE_RANGE)
   const rest = range ? header.slice(0, range.index).trim() : header
   let parts = rest.split(/\s+\|\s+/)

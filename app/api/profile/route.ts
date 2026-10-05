@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server"
 
+import { matchCandidate } from "@/lib/jobs/matches"
 import { onboardingSchema } from "@/lib/profile/schema"
 import { saveProfile } from "@/lib/profile/store"
 
-type Envelope = { success: true } | { success: false; error: string }
+type Envelope = { success: true; data: { matchedJobs: number } } | { success: false; error: string }
 
 export async function POST(request: Request) {
   // Auth check goes here once Clerk is wired (spec 008).
@@ -15,10 +16,12 @@ export async function POST(request: Request) {
       { status: 400 },
     )
   }
+  let profile
   try {
-    await saveProfile(parsed.data)
+    profile = await saveProfile(parsed.data)
   } catch {
     return NextResponse.json<Envelope>({ success: false, error: "Your resume upload expired. Upload it again." }, { status: 400 })
   }
-  return NextResponse.json<Envelope>({ success: true })
+  // A new candidate is matched against the central pool as soon as onboarding finishes.
+  return NextResponse.json<Envelope>({ success: true, data: { matchedJobs: await matchCandidate(profile) } })
 }

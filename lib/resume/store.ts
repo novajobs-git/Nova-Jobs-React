@@ -3,6 +3,7 @@ import "server-only"
 import { mkdir, readFile, writeFile } from "node:fs/promises"
 import path from "node:path"
 
+import { matchCandidate } from "@/lib/jobs/matches"
 import { updateResumeSkills, type StoredProfile } from "@/lib/profile/store"
 import { seedResume } from "./seed"
 import { resumeDocSchema, type ResumeDoc } from "./types"
@@ -26,6 +27,7 @@ export async function saveBuiltResume(doc: ResumeDoc): Promise<string> {
   const updatedAt = new Date().toISOString()
   await mkdir(path.dirname(RESUME_FILE), { recursive: true })
   await writeFile(RESUME_FILE, JSON.stringify({ ...doc, updatedAt }, null, 2), "utf8")
-  await updateResumeSkills(doc.skills)
+  const profile = await updateResumeSkills(doc.skills)
+  await matchCandidate(profile)
   return updatedAt
 }

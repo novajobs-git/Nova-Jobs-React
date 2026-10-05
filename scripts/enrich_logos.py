@@ -1,12 +1,12 @@
-"""Add company logos to jobs already in the pool (spec 010).
+"""Download company logos for jobs already in the pool (specs 010, 011).
 
-New scrapes record `companyLogo` themselves; this fills it in for jobs
-scraped before that. Each board's page is fetched once and its logo is read
-from the HTML (see scrapers.logo_from_html). A board with no logo is stored
+New scrapes download `companyLogo` themselves; this fills it in for jobs
+that have none, and converts old hot-linked logo URLs into downloaded files
+in data/logos/. Each board is handled once. A board with no logo is stored
 as `null` so re-runs skip it; pass --retry to try those again.
 
 Run from the repo root:
-    .venv\\Scripts\\python -m scripts.enrich_logos [--concurrency 8] [--retry]
+    .venv\Scripts\python -m scripts.enrich_logos [--concurrency 8] [--retry]
 """
 
 from __future__ import annotations
@@ -18,6 +18,7 @@ from pathlib import Path
 
 from scripts.ats.boards import ATS
 from scripts.ats.browser import browser_context
+from scripts.ats.logos import save_logo
 from scripts.ats.models import Board
 from scripts.ats.scrapers import board_logo, board_url
 
@@ -34,9 +35,18 @@ def board_page(job: dict) -> str | None:
     return board_url(key, Board(ats=job["ats"], company=job["company"], slug=job["boardSlug"])) if key else None
 
 
+def needs_logo(job: dict, retry: bool) -> bool:
+    logo = job.get("companyLogo", ...)
+    if logo is ...:
+        return True  # never looked
+    if logo is None:
+        return retry  # looked, none found
+    return logo.startswith("http")  # hot-linked before spec 011
+
+
 async def run(concurrency: int, retry: bool, headed: bool) -> None:
     pool = json.loads(POOL.read_text(encoding="utf-8"))
-    todo = [j for j in pool["jobs"] if "companyLogo" not in j or (retry and j["companyLogo"] is None)]
+    todo = [j for j in pool["jobs"] if needs_logo(j, retry)]
 
     boards: dict[tuple[str, str], list[dict]] = {}
     for job in todo:
@@ -45,23 +55,25 @@ async def run(concurrency: int, retry: bool, headed: bool) -> None:
 
     gate = asyncio.Semaphore(concurrency)
 
-    async def fetch(jobs: list[dict]) -> str | None:
-        url = board_page(jobs[0])
-        if not url:
-            return None
+    async def fetch(jobs: list[dict]) -> tuple[str | None, str | None]:
+        first = jobs[0]
         async with gate:
-            return await board_logo(context.request, ATS_KEY[jobs[0]["ats"]], url)
+            source = first.get("companyLogoSource") or (first["companyLogo"] if (first.get("companyLogo") or "").startswith("http") else None)
+            if not source and (url := board_page(first)):
+                source = await board_logo(context.request, ATS_KEY[first["ats"]], url)
+            return source, (await save_logo(context.request, source) if source else None)
 
     async with browser_context(headed=headed) as context:
-        logos = await asyncio.gather(*(fetch(jobs) for jobs in boards.values()))
+        results = await asyncio.gather(*(fetch(jobs) for jobs in boards.values()))
 
-    for jobs, logo in zip(boards.values(), logos):
+    for jobs, (source, logo) in zip(boards.values(), results):
         for job in jobs:
             job["companyLogo"] = logo
+            job["companyLogoSource"] = source
     POOL.write_text(json.dumps(pool, indent=1, ensure_ascii=False), encoding="utf-8")
 
     by_ats: dict[str, list[int]] = {}
-    for (ats, _), logo in zip(boards, logos):
+    for (ats, _), (_, logo) in zip(boards, results):
         stats = by_ats.setdefault(ats, [0, 0])
         stats[0] += 1
         stats[1] += bool(logo)

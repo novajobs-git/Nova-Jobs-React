@@ -62,7 +62,7 @@ async function resumeText(resumeId: string): Promise<string> {
   return readFile(path.join(RESUME_DIR, `${resumeId}.txt`), "utf8")
 }
 
-export async function saveProfile(data: OnboardingData): Promise<void> {
+export async function saveProfile(data: OnboardingData): Promise<StoredProfile> {
   const profile: StoredProfile = {
     full_name: `${data.firstName} ${data.lastName}`.trim(),
     first_name: data.firstName,
@@ -95,14 +95,16 @@ export async function saveProfile(data: OnboardingData): Promise<void> {
   }
   await mkdir(path.dirname(PROFILE_FILE), { recursive: true })
   await writeFile(PROFILE_FILE, JSON.stringify(profile, null, 2), "utf8")
+  return profile
 }
 
 /** The resume builder's saved skills replace the parsed ones for matching. */
-export async function updateResumeSkills(skills: string[]): Promise<void> {
+export async function updateResumeSkills(skills: string[]): Promise<StoredProfile> {
   const profile = await getProfile()
   if (!profile) throw new Error("Finish onboarding before saving a resume.")
   const updated: StoredProfile = { ...profile, resume_skills: skills, updated_at: new Date().toISOString() }
   await writeFile(PROFILE_FILE, JSON.stringify(updated, null, 2), "utf8")
+  return updated
 }
 
 export async function getProfile(): Promise<StoredProfile | null> {

@@ -10,7 +10,7 @@ export const MATCH_THRESHOLD = 30
 export interface Job {
   id: string
   company: string
-  /** Logo URL read from the company's ATS board (spec 010); the UI falls back to a building placeholder. */
+  /** Company logo downloaded from its ATS board (/logos/<file>, specs 010-011); the UI falls back to a building placeholder. */
   companyLogo?: string
   role: string
   location: string

@@ -63,15 +63,13 @@ export function CompanyLogo({ src, className }: { src?: string; className?: stri
   return (
     <span
       className={cn(
-        "flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border",
-        // Logos are drawn for light backgrounds, so the tile stays white in dark mode too.
-        showLogo ? "bg-white" : "bg-card",
+        "flex size-9 shrink-0 items-center justify-center overflow-hidden",
         className,
       )}
       aria-hidden
     >
       {showLogo ? (
-        // Logos are hot-linked from each ATS's own CDN, too many hosts for next/image's remotePatterns.
+        // Logos are served from data/logos (spec 011) in mixed formats, incl. SVG and ICO.
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={src}
@@ -79,7 +77,7 @@ export function CompanyLogo({ src, className }: { src?: string; className?: stri
           loading="lazy"
           decoding="async"
           referrerPolicy="no-referrer"
-          className="size-full object-contain p-1"
+          className="size-full object-contain"
           onError={() => setFailed(true)}
         />
       ) : (

@@ -21,7 +21,7 @@ const NAV = [
   { href: null, label: "Jobs" },
   { href: "/applications", label: "Applications" },
   { href: "/resume", label: "Resume Builder" },
-  { href: null, label: "Resume Analysis" },
+  { href: "/resume-analysis", label: "Resume Analysis" },
   { href: null, label: "Settings" },
 ] as const
 
@@ -45,7 +45,7 @@ export function AppSidebar() {
       <SidebarContent className="px-3.5">
         <SidebarMenu className="gap-1">
           {NAV.map((item) => {
-            const active = item.href !== null && pathname.startsWith(item.href)
+            const active = item.href !== null && (pathname === item.href || pathname.startsWith(`${item.href}/`))
             return (
               <SidebarMenuItem key={item.label}>
                 {item.href ? (

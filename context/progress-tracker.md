@@ -390,3 +390,12 @@ code is implemented.
   `companyLogo`; `scripts/enrich_logos.py` backfills the existing pool;
   the UI falls back to a building placeholder icon. Numbered 010: 007/008 are
   reserved for the schema/wiring specs and 009 is the resume builder.
+- **2026-10-05** — `specs/011-central-pool-auto-match.md`: re-scraped the
+  pool from empty; logos are now downloaded into `data/logos/` (served at
+  `/logos/<file>`) instead of hot-linked; candidates are matched against the
+  central pool on onboarding and resume save (`data/matches/`), and
+  re-matched automatically after a re-scrape.
+- **2026-10-05** — Spec 012 (Auto-Apply engine wiring) is on hold: the
+  engine port exists in `engine/` but the app-side wiring was blocked
+  pending the user's explicit approval for live application submission.
+  Built `specs/013-resume-analysis.md` (`/resume-analysis`).

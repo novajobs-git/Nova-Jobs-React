@@ -25,7 +25,8 @@ class ScrapedJob:
     url: str
     country: str | None = None
     posted_at: str | None = None
-    company_logo: str | None = None
+    company_logo: str | None = None  # app path of the downloaded logo, /logos/<file>
+    company_logo_source: str | None = None  # where it was downloaded from
     scraped_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat(timespec="seconds"))
 
     @property
@@ -49,5 +50,6 @@ class ScrapedJob:
             "url": d["url"],
             "postedAt": d["posted_at"],
             "companyLogo": d["company_logo"],
+            "companyLogoSource": d["company_logo_source"],
             "scrapedAt": d["scraped_at"],
         }

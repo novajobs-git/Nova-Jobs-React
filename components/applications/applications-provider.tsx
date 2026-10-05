@@ -37,6 +37,7 @@ export function ApplicationsProvider({ initial, children }: { initial: Applicati
         id: `app_local_${job.id}`,
         jobId: job.id,
         company: job.company,
+        companyLogo: job.companyLogo,
         role: job.role,
         location: job.location,
         ats: job.ats,

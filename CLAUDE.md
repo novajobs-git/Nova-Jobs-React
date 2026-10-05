@@ -32,7 +32,8 @@ The target stack is Clerk + Supabase + a Python apply engine. **None of it is wi
 | Data | Stand-in | Accessor |
 |---|---|---|
 | Candidate profile + resume | `data/profiles/candidate.json`, `data/resumes/<uuid>.pdf/.txt` | `lib/profile/store.ts` → `getProfile()`, `saveProfile()`, `saveResume()` |
-| Job pool | `data/jobs/us-jobs.json` from the Python scrapers; falls back to `lib/jobs/mock-data.ts` if missing | `lib/jobs/pool.ts` → `getJobs(skills)` |
+| Job pool (central, shared by all candidates) | `data/jobs/us-jobs.json` from the Python scrapers; logos downloaded to `data/logos/`, served at `/logos/<file>` | `lib/jobs/pool.ts` → `loadPool()` |
+| Candidate matches | `data/matches/candidate.json`, written on onboarding and resume save, recomputed when the pool or skills change; demo jobs if no pool | `lib/jobs/matches.ts` → `matchCandidate()`, `getMatchedJobs(profile)` |
 | Applications | synthetic `lib/applications/mock-data.ts` | `getApplications()` |
 | Apply queue | client-side `ApplicationsProvider` context (resets on reload) | `components/applications/applications-provider.tsx` |
 
