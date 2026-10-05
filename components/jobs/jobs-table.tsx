@@ -35,7 +35,7 @@ export function JobsTable({ jobs, applicationFor }: { jobs: Job[]; applicationFo
             <TableRow key={job.id} className="h-[67px]">
               <TableCell className="pl-4">
                 <div className="flex items-center gap-3">
-                  <CompanyLogo company={job.company} />
+                  <CompanyLogo src={job.companyLogo} />
                   <span className="hidden text-[15px] text-muted-foreground lg:inline">{job.company}</span>
                 </div>
               </TableCell>

@@ -25,6 +25,7 @@ class ScrapedJob:
     url: str
     country: str | None = None
     posted_at: str | None = None
+    company_logo: str | None = None
     scraped_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat(timespec="seconds"))
 
     @property
@@ -47,5 +48,6 @@ class ScrapedJob:
             "location": d["location"],
             "url": d["url"],
             "postedAt": d["posted_at"],
+            "companyLogo": d["company_logo"],
             "scrapedAt": d["scraped_at"],
         }

@@ -45,12 +45,11 @@ Status colors specifically (jobs table, Workbench queue panel):
 
 ## Border Radius
 
-- `--radius: 6px` as the base token (matches the button radius already
-  validated across the current app's entire button system this session).
-- Cards, inputs, and dialogs/sheets can use a slightly larger radius
-  (e.g. `--radius-lg: 10–12px`) for visual hierarchy, but everything
-  derives from the one base token — never a one-off radius value typed
-  into a component.
+- `--radius: 0px`: every component has square, 90° corners (buttons,
+  cards, inputs, pills, dots, avatars, checkboxes, radios, switches,
+  charts). Every `rounded-*` step derives from this token and computes
+  to 0; never type a one-off radius into a component, and use
+  `rounded-none` where `rounded-full` would otherwise apply.
 
 ## Component Library
 

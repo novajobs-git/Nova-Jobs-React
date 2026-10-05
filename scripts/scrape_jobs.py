@@ -21,7 +21,7 @@ from pathlib import Path
 from scripts.ats.boards import ATS, load_boards
 from scripts.ats.browser import browser_context
 from scripts.ats.models import Board, ScrapedJob
-from scripts.ats.scrapers import SCRAPERS, BoardSkipped, us_only
+from scripts.ats.scrapers import SCRAPERS, BoardSkipped, board_logo, board_url, us_only
 
 OUTPUT = Path(__file__).resolve().parent.parent / "data" / "jobs" / "us-jobs.json"
 BOARD_TIMEOUT_S = 120
@@ -46,7 +46,14 @@ async def scrape_board(context, ats: str, board: Board, gate: asyncio.Semaphore,
         kept = us_only(jobs)
         stats["scraped"] += len(jobs)
         stats["non_us"] += len(jobs) - len(kept)
-        print(f"  [{board.ats}] {board.slug}: {len(jobs)} jobs, {len(kept)} US ({time.monotonic() - started:.1f}s)")
+        logo = await board_logo(context.request, ats, board_url(ats, board)) if kept else None
+        for job in kept:
+            job.company_logo = logo
+        stats["logos"] += bool(logo)
+        print(
+            f"  [{board.ats}] {board.slug}: {len(jobs)} jobs, {len(kept)} US, "
+            f"{'logo' if logo else 'no logo'} ({time.monotonic() - started:.1f}s)"
+        )
         return kept
 
 
@@ -59,7 +66,7 @@ async def run(args: argparse.Namespace) -> None:
     async with browser_context(headed=args.headed) as context:
         for ats in args.ats:
             boards = load_boards(ats, args.boards, seed, args.slug)
-            stats = {"boards": len(boards), "scraped": 0, "non_us": 0, "skipped": 0, "failed": 0}
+            stats = {"boards": len(boards), "scraped": 0, "non_us": 0, "skipped": 0, "failed": 0, "logos": 0}
             print(f"[{ATS[ats]}] {len(boards)} boards")
             results = await asyncio.gather(*(scrape_board(context, ats, b, gate, stats) for b in boards))
             for jobs in results:
@@ -87,7 +94,7 @@ async def run(args: argparse.Namespace) -> None:
     for name, s in summary.items():
         print(
             f"  {name:16} boards {s['boards']:>4} | scraped {s['scraped']:>5} | US {s['us']:>5} | "
-            f"non-US dropped {s['non_us']:>5} | skipped {s['skipped']:>3} | failed {s['failed']:>3}"
+            f"non-US dropped {s['non_us']:>5} | skipped {s['skipped']:>3} | failed {s['failed']:>3} | logos {s['logos']:>3}"
         )
     print(f"  pool: {before} -> {len(pool)} jobs ({len(pool) - before} new) in {OUTPUT}")
 

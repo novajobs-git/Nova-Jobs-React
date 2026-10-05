@@ -42,7 +42,7 @@ The candidate stays in control: jobs are applied to one click at a time through 
 ## Brand Commitments
 
 - Name: NovaJobs (operated by NovaStaffs).
-- Visual system is pinned by `context/ui-context.md`: shadcn/ui New York variant exclusively, Inter, primary `#3B82F6` / hover `#2563EB`, `--radius: 6px`, status colors applied = green, queued/applying = primary blue, failed/needs review = red, not applied = muted gray. Light and dark mode from day one. lucide-react only.
+- Visual system is pinned by `context/ui-context.md`: shadcn/ui New York variant exclusively, Inter, primary `#3B82F6` / hover `#2563EB`, `--radius: 0px` (square corners everywhere), status colors applied = green, queued/applying = primary blue, failed/needs review = red, not applied = muted gray. Light and dark mode from day one. lucide-react only.
 - Voice: minimal, honest, specific. Failures are stated with their real reason, never a generic error.
 
 ## Evidence on Hand

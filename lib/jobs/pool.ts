@@ -24,6 +24,8 @@ const scrapedJob = z.object({
   location: z.string(),
   url: z.url(),
   description: z.string().nullish(),
+  // A bad logo URL drops the logo, never the pool.
+  companyLogo: z.url().nullish().catch(null),
   postedAt: z.string().nullable(),
   scrapedAt: z.string(),
 })
@@ -74,6 +76,7 @@ export async function getJobs(candidateSkills: string[]): Promise<Job[]> {
     matched.push({
       id: job.id,
       company: job.company,
+      companyLogo: job.companyLogo ?? undefined,
       role: job.title,
       location: job.location,
       workMode: /remote/i.test(job.location) ? "Remote" : "On-site",

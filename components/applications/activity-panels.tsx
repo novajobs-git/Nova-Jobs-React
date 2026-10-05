@@ -37,7 +37,7 @@ export function ActivityPanels({ daily, ats }: { daily: DailyActivity[]; ats: At
             <ChartTooltip cursor={{ fill: "var(--muted)" }} content={<ChartTooltipContent />} />
             <Bar dataKey="applied" stackId="a" fill="var(--color-applied)" isAnimationActive={false} />
             <Bar dataKey="needs_review" stackId="a" fill="var(--color-needs_review)" isAnimationActive={false} />
-            <Bar dataKey="failed" stackId="a" fill="var(--color-failed)" radius={[3, 3, 0, 0]} isAnimationActive={false} />
+            <Bar dataKey="failed" stackId="a" fill="var(--color-failed)" isAnimationActive={false} />
           </BarChart>
         </ChartContainer>
       </section>
@@ -56,8 +56,8 @@ export function ActivityPanels({ daily, ats }: { daily: DailyActivity[]; ats: At
                     <span className="font-medium text-foreground">{rate}%</span> · {row.applied} of {row.attempted}
                   </span>
                 </div>
-                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted" role="presentation">
-                  <div className="h-full rounded-full bg-success" style={{ width: `${rate}%` }} />
+                <div className="mt-1.5 h-1.5 overflow-hidden rounded-none bg-muted" role="presentation">
+                  <div className="h-full rounded-none bg-success" style={{ width: `${rate}%` }} />
                 </div>
               </li>
             )

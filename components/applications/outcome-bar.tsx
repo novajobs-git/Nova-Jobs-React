@@ -32,7 +32,7 @@ export function OutcomeBar({ counts, selected, onSelect }: OutcomeBarProps) {
 
   return (
     <section aria-label="Outcome of every application" className="rounded-lg border bg-card p-4 md:p-5">
-      <div className="flex h-3 w-full gap-0.5 overflow-hidden rounded-full" role="presentation">
+      <div className="flex h-3 w-full gap-0.5 overflow-hidden rounded-none" role="presentation">
         {OUTCOMES.filter((o) => counts[o] > 0).map((o) => (
           <button
             key={o}
@@ -65,7 +65,7 @@ export function OutcomeBar({ counts, selected, onSelect }: OutcomeBarProps) {
               )}
             >
               <span className="flex items-center gap-2 text-sm text-muted-foreground group-hover:text-foreground">
-                <span className={cn("size-2.5 rounded-full", meta.fill)} aria-hidden />
+                <span className={cn("size-2.5 rounded-none", meta.fill)} aria-hidden />
                 {meta.label}
               </span>
               <span className="mt-1 flex items-baseline gap-2">

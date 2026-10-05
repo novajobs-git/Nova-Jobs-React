@@ -55,9 +55,9 @@ typography:
     lineHeight: 1.333
     fontFeature: "\"tnum\""
 rounded:
-  md: "4.8px"
-  lg: "6px"
-  pill: "9999px"
+  md: "0px"
+  lg: "0px"
+  pill: "0px"
 spacing:
   "1": "4px"
   "2": "8px"
@@ -144,7 +144,7 @@ Light and dark themes are both first-class, switched by class (`.dark`) through 
 - One blue (`--primary`) for actions, links, and the in-progress state; no second accent hue.
 - Status triad: green applied, blue queued/applying, red failed or needs review, each paired with a label and icon.
 - Cool neutrals at OKLCH hue 255, very low chroma, never pure grey.
-- Flat panels on 1px hairlines at a 6px radius; shadows only on floating overlays and form controls.
+- Flat panels on 1px hairlines with square corners; shadows only on floating overlays and form controls.
 - Inter throughout, Tailwind's default type scale, tabular numerals for every count, percent, and timestamp.
 
 ## Colors
@@ -218,7 +218,7 @@ The system is flat with hairlines. Panels, tables, and lists sit on the page at 
 
 ## Shapes
 
-Every radius derives from the single `--radius: 6px` base. Section panels, the table frame, and the tabs track use it directly (`lg`). Buttons use the base radius (`lg`, 6px), as pinned by ui-context. Inputs, select triggers, tab triggers, legend buttons, and nav items use the 0.8x step (`md`, 4.8px), so a field sits slightly crisper than its container. Pills are reserved for continuous data and small indicators: the outcome bar, legend and status dots, progress and ATS meters, and count badges. Stacked chart bars round only their top 3px.
+Every corner is square. The single `--radius` base is `0px`, so every step of the scale (`sm` through `4xl`, plus `panel`) computes to 0. Buttons, inputs, panels, tabs, pills, status dots, avatars, checkboxes, radios, switches, progress meters and chart bars all meet at 90°. Where a component would otherwise reach for `rounded-full`, it uses `rounded-none`.
 
 **The Derived Radius Rule.** Radii come from the `--radius` scale. Never type a one-off radius into a component.
 
@@ -226,7 +226,7 @@ Every radius derives from the single `--radius: 6px` base. Section panels, the t
 
 ### Buttons
 Compact and quiet; blue is spent only where the user acts.
-- **Shape:** Gently squared (6px, the base radius), 36px tall by default, 32px at `sm` (the size used in lists).
+- **Shape:** Square corners (0px, the base radius), 36px tall by default, 32px at `sm` (the size used in lists).
 - **Primary:** Signal Blue with near-white label; used for the one resolving action per row (Retry, Answer question, Update profile).
 - **Hover / Focus:** Hover swaps to Pressed Blue. Focus shows a 3px ring at 50% ring color. Pressing nudges the button down 1px.
 - **Outline:** Paper fill, Hairline border, Mist on hover; for low-stakes actions (Dismiss, Clear filters).
@@ -237,19 +237,19 @@ Compact and quiet; blue is spent only where the user acts.
 - **Outline badge:** Hairline border, Slate Text; used for the "Demo data" marker in the top bar.
 
 ### Cards / Containers
-- **Corner Style:** 6px.
+- **Corner Style:** Square (0px).
 - **Background:** Paper, with an optional Mist header band at 50%.
 - **Shadow Strategy:** None (see The Hairline Rule).
 - **Border:** 1px Hairline; internal rows divided by Hairline rules.
 - **Internal Padding:** 16px, rising to 20px at 768px. Section headers sit in their own ruled band with 12px vertical padding.
 
 ### Inputs / Fields
-- **Style:** 36px tall, 4.8px radius, Field Line stroke, transparent fill (a 30% Field Line wash in dark mode), search inputs with a 16px leading lucide icon.
+- **Style:** 36px tall, square corners, Field Line stroke, transparent fill (a 30% Field Line wash in dark mode), search inputs with a 16px leading lucide icon.
 - **Focus:** Border turns Signal Blue with a 3px 50% ring.
 - **Error / Disabled:** Failure Red border with a 20% red ring; disabled at 50% opacity.
 
 ### Tabs
-- **Style:** A Mist track (6px radius, 3px inset) holding triggers at 60% Ink. The active trigger lifts to Paper with full Ink and a small shadow. Each trigger carries a count badge.
+- **Style:** A Mist track (square corners, 3px inset) holding triggers at 60% Ink. The active trigger lifts to Paper with full Ink and a small shadow. Each trigger carries a count badge.
 
 ### Navigation
 - **Style:** Rail-colored sidebar, icon-collapsible, lucide icon plus 14px label per item. Active item is Rail Selected with Ink text. Unbuilt routes are aria-disabled with a "Soon" badge. The Applications item carries a red attention count. The wordmark is 16px bold, with "Nova" in Signal Blue and "Jobs" in Ink. On mobile the sidebar becomes an off-canvas sheet.
@@ -269,7 +269,7 @@ A sticky translucent bottom bar: a live In-Progress Blue dot (pinging while appl
 - **Do** pair every status color with its word and its lucide icon (The Triple-Signal Status Rule).
 - **Do** use `success-text` for green text and `success` for green fills; use Failure Red for all Needs-review text.
 - **Do** set every number in tabular figures.
-- **Do** separate content with 1px Hairline borders and dividers at the 6px radius.
+- **Do** separate content with 1px Hairline borders and dividers with square corners.
 - **Do** reference color only through the CSS custom properties; component code carries no hex values.
 - **Do** keep the Workbench sheet to the right of the sidebar edge.
 - **Do** respect `prefers-reduced-motion` for pulses and scroll-into-view.

@@ -43,23 +43,23 @@ export function JobsView({ jobs, firstName }: { jobs: Job[]; firstName: string }
           <h1 className="text-[30px] leading-tight font-bold tracking-tight">
             {greeting}, {firstName}
           </h1>
-          <span className="mt-2 inline-flex rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-sm font-semibold text-primary-hover">
+          <span className="mt-2 inline-flex rounded-none border border-primary/25 bg-primary/10 px-3 py-1 text-sm font-semibold text-primary-hover">
             {DEMO_CANDIDATE.plan}
           </span>
         </div>
         <div className="flex items-center gap-3">
           <span
             className={cn(
-              "inline-flex h-10 items-center gap-2 rounded-full border px-4 text-[15px] font-medium",
+              "inline-flex h-10 items-center gap-2 rounded-none border px-4 text-[15px] font-medium",
               autoApply ? "border-success/25 bg-success/10 text-success-text" : "border-border bg-card text-muted-foreground",
             )}
           >
-            <span className={cn("size-2 rounded-full", autoApply ? "bg-success" : "bg-muted-foreground/50")} aria-hidden />
+            <span className={cn("size-2 rounded-none", autoApply ? "bg-success" : "bg-muted-foreground/50")} aria-hidden />
             {autoApply ? "Auto-Apply active" : "Auto-Apply paused"}
           </span>
           <Link
             href="/applications"
-            className="inline-flex h-10 items-center rounded-full border bg-card px-4 text-[15px] font-medium text-foreground/75 transition-colors hover:text-foreground"
+            className="inline-flex h-10 items-center rounded-none border bg-card px-4 text-[15px] font-medium text-foreground/75 transition-colors hover:text-foreground"
           >
             View analytics
           </Link>

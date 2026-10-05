@@ -60,7 +60,7 @@ export function Chip({ label, onRemove, className }: { label: string; onRemove?:
   return (
     <span
       className={cn(
-        "inline-flex h-8 items-center gap-1 rounded-full border border-primary/20 bg-primary/8 pr-1 pl-3 text-sm font-medium text-primary-hover",
+        "inline-flex h-8 items-center gap-1 rounded-none border border-primary/20 bg-primary/8 pr-1 pl-3 text-sm font-medium text-primary-hover",
         !onRemove && "pr-3",
         className,
       )}
@@ -71,7 +71,7 @@ export function Chip({ label, onRemove, className }: { label: string; onRemove?:
           type="button"
           onClick={onRemove}
           aria-label={`Remove ${label}`}
-          className="flex size-6 items-center justify-center rounded-full text-primary-hover/70 hover:bg-primary/15 hover:text-primary-hover"
+          className="flex size-6 items-center justify-center rounded-none text-primary-hover/70 hover:bg-primary/15 hover:text-primary-hover"
         >
           <XIcon className="size-3.5" />
         </button>

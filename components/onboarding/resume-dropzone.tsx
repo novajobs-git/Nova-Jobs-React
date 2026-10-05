@@ -92,7 +92,7 @@ export function ResumeDropzone({ fileName, skillCount, onUploaded, invalid }: Re
             </>
           ) : (
             <>
-              <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary-hover">
+              <span className="flex size-12 items-center justify-center rounded-none bg-primary/10 text-primary-hover">
                 <UploadIcon className="size-5" aria-hidden />
               </span>
               <span className="text-[15px] font-semibold">

@@ -174,7 +174,7 @@ function Paper({ doc, active, onSelect, print }: PaperProps) {
       className={cn(
         "relative break-inside-avoid-page",
         !print &&
-          "cursor-pointer rounded-[2px] outline-2 outline-offset-[6px] outline-transparent transition-[outline-color] duration-200 hover:outline-primary/20 motion-reduce:transition-none",
+          "cursor-pointer rounded-none outline-2 outline-offset-[6px] outline-transparent transition-[outline-color] duration-200 hover:outline-primary/20 motion-reduce:transition-none",
         !print && active === id && "outline-primary/55 hover:outline-primary/55",
         className,
       )}

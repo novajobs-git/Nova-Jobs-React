@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { BadgeCheckIcon, CircleHelpIcon, CircleSlashIcon } from "lucide-react"
 import { toast } from "sonner"
 
@@ -53,16 +54,39 @@ export function JobAction({ job, application, className }: { job: Job; applicati
   )
 }
 
-// Monogram tiles stand in for company logos until the job pool stores real ones.
-const LOGO_COLORS = ["bg-indigo-500", "bg-rose-500", "bg-slate-900", "bg-emerald-600", "bg-sky-500", "bg-amber-500", "bg-violet-600", "bg-teal-600"]
+// Generic building icon for companies whose board has no logo (spec 010) or whose logo fails to load.
+const PLACEHOLDER_LOGO = "/company-placeholder.png"
 
-export function CompanyLogo({ company, className }: { company: string; className?: string }) {
-  const hash = [...company].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)
+export function CompanyLogo({ src, className }: { src?: string; className?: string }) {
+  const [failed, setFailed] = useState(false)
+  const showLogo = src && !failed
   return (
-    <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-lg border bg-card", className)} aria-hidden>
-      <span className={cn("flex size-[22px] items-center justify-center rounded-[5px] text-[11px] font-bold text-white", LOGO_COLORS[hash % LOGO_COLORS.length])}>
-        {company[0]}
-      </span>
+    <span
+      className={cn(
+        "flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border",
+        // Logos are drawn for light backgrounds, so the tile stays white in dark mode too.
+        showLogo ? "bg-white" : "bg-card",
+        className,
+      )}
+      aria-hidden
+    >
+      {showLogo ? (
+        // Logos are hot-linked from each ATS's own CDN, too many hosts for next/image's remotePatterns.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={src}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          className="size-full object-contain p-1"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        // A black glyph on transparency: softened on light tiles, inverted on dark ones.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={PLACEHOLDER_LOGO} alt="" className="size-5 opacity-55 dark:invert" />
+      )}
     </span>
   )
 }
@@ -71,7 +95,7 @@ export function MatchPill({ score }: { score: number }) {
   return (
     <span
       className={cn(
-        "inline-flex h-6 shrink-0 items-center rounded-full border px-2.5 text-xs font-bold tabular-nums",
+        "inline-flex h-6 shrink-0 items-center rounded-none border px-2.5 text-xs font-bold tabular-nums",
         score >= 90 ? "border-success/20 bg-success/10 text-success-text" : "border-primary/20 bg-primary/10 text-primary-hover",
       )}
     >

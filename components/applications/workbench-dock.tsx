@@ -39,11 +39,11 @@ export function WorkbenchDock() {
           aria-label={applying ? `Open Auto-Apply Queue. Applying to ${applying.company} now.` : "Open Auto-Apply Queue"}
         >
           <span className="relative flex size-2 shrink-0" aria-hidden>
-            {applying && <span className="absolute inset-0 animate-ping rounded-full bg-primary/50 motion-reduce:animate-none" />}
-            <span className={applying ? "relative size-2 rounded-full bg-primary" : "relative size-2 rounded-full bg-primary/30"} />
+            {applying && <span className="absolute inset-0 animate-ping rounded-none bg-primary/50 motion-reduce:animate-none" />}
+            <span className={applying ? "relative size-2 rounded-none bg-primary" : "relative size-2 rounded-none bg-primary/30"} />
           </span>
           <span className="text-[15px] font-semibold">Auto-Apply Queue</span>
-          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary-hover tabular-nums">
+          <span className="rounded-none bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary-hover tabular-nums">
             {inProgress.length}
           </span>
           <ChevronUpIcon className="ml-auto size-4 text-muted-foreground" aria-hidden />

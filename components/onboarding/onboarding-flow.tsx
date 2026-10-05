@@ -3,9 +3,11 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeftIcon, LoaderCircleIcon } from "lucide-react"
+import { ArrowLeftIcon, LoaderCircleIcon, LogOutIcon, UserRoundIcon } from "lucide-react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
@@ -126,15 +128,33 @@ export function OnboardingFlow() {
 
   return (
     <div className="flex min-h-svh flex-col">
-      <header className="sticky top-0 z-10 border-b bg-card">
-        <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-5">
-          <Link href="/" className="font-logo text-2xl leading-none" aria-label="NovaJobs">
+      {/* Mirrors the dashboard: logo where the sidebar puts it, controls where TopBar puts them. */}
+      <header className="sticky top-0 z-20 border-b bg-card">
+        <div className="flex h-[66px] items-center gap-3 px-4 md:pr-8 md:pl-6">
+          <Link href="/" className="font-logo text-[32px] leading-none" aria-label="NovaJobs">
             <span className="text-foreground">Nova</span>
             <span className="text-primary-hover">Jobs</span>
           </Link>
-          <span className="text-sm font-medium text-muted-foreground tabular-nums">
-            Step {index + 1} of {STEPS.length}
-          </span>
+          <div className="ml-auto flex items-center gap-3">
+            <span className="text-sm font-medium text-muted-foreground tabular-nums">
+              Step {index + 1} of {STEPS.length}
+            </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                aria-label="Account menu"
+                className="flex size-10 items-center justify-center rounded-lg bg-primary-hover text-[15px] font-semibold text-primary-foreground shadow-md shadow-primary/30 outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
+              >
+                {draft.firstName?.trim() ? draft.firstName.trim()[0].toUpperCase() : <UserRoundIcon className="size-[18px]" aria-hidden />}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-40">
+                {/* Wire to Clerk sign-out with spec 008, same as the sidebar's Log out. */}
+                <DropdownMenuItem variant="destructive" onSelect={() => toast("Log out is coming soon")}>
+                  <LogOutIcon aria-hidden />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
         <Progress
           value={((index + 1) / STEPS.length) * 100}

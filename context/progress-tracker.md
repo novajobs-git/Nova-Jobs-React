@@ -177,7 +177,7 @@ signatures so the UI doesn't change.
   - Page: "Good afternoon, Parth" + plan pill, Auto-Apply status pill,
     View analytics (→ `/applications`), 4 top-match cards, and an "All
     matched jobs" table. The bottom bar is now "Auto-Apply Queue" + count.
-  - Company logos are monogram tiles (the job pool has no logos yet);
+  - Company logos come from the ATS boards (spec 010), with a building placeholder when a board has none;
     companies are still fictional demo data.
   - **Removed vs. spec 003:** the Location / Experience / Company /
     Sponsorship filters and search, and the sponsorship and salary
@@ -383,3 +383,10 @@ code is implemented.
   reserved 007/008). Seeding parses the uploaded resume's headings, dated
   entry lines and wrapped bullets. User asked not to run typecheck/lint;
   they test changes themselves.
+- **2026-10-05** — Square corners app-wide (`--radius: 0px`). Top matches
+  became one divided strip. Company logos (spec 010): the scrapers now
+  read each board's own logo (Greenhouse/Workday/SmartRecruiters
+  `og:image`, Lever header img, Ashby `logoSquareImageUrl`) into
+  `companyLogo`; `scripts/enrich_logos.py` backfills the existing pool;
+  the UI falls back to a building placeholder icon. Numbered 010: 007/008 are
+  reserved for the schema/wiring specs and 009 is the resume builder.

@@ -44,7 +44,7 @@ export function TopBar({ candidateName }: { candidateName: string }) {
           onClick={() => toast("No new notifications")}
         >
           <BellIcon className="size-[18px]" />
-          <span className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-destructive" aria-hidden />
+          <span className="absolute top-1.5 right-1.5 size-1.5 rounded-none bg-destructive" aria-hidden />
         </Button>
 
         <span

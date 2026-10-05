@@ -278,7 +278,7 @@ export function SkillsSection({ doc, update }: SectionProps) {
           <ul className="flex flex-wrap gap-1.5">
             {pending.map((s) => (
               <li key={s}>
-                <button type="button" onClick={() => setSkills([...doc.skills, s])} className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50" aria-label={`Add ${s}`}>
+                <button type="button" onClick={() => setSkills([...doc.skills, s])} className="rounded-none outline-none focus-visible:ring-3 focus-visible:ring-ring/50" aria-label={`Add ${s}`}>
                   <Chip label={`+ ${s}`} className="border-dashed bg-transparent hover:bg-primary/8" />
                 </button>
               </li>

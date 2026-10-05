@@ -8,12 +8,13 @@ live boards on 2026-10-02.
 
 from __future__ import annotations
 
+import html
 import re
 from datetime import datetime, timedelta, timezone
 from typing import Awaitable, Callable
 from urllib.parse import urlparse
 
-from playwright.async_api import Page, TimeoutError as PlaywrightTimeout
+from playwright.async_api import APIRequestContext, Page, TimeoutError as PlaywrightTimeout
 
 from scripts.ats.browser import NAV_TIMEOUT_MS, capture_json
 from scripts.ats.models import Board, ScrapedJob
@@ -27,6 +28,20 @@ SMARTRECRUITERS_MAX_DETAIL_LOOKUPS = 80  # job pages opened on department-groupe
 
 class BoardSkipped(Exception):
     """The board can't be scraped as an ATS board (e.g. it redirects to the company's own site)."""
+
+
+# Board page when the directory row has no URL. Workday has no default: its
+# boards live on per-tenant hosts.
+BOARD_URLS = {
+    "greenhouse": "https://job-boards.greenhouse.io/{slug}",
+    "lever": "https://jobs.lever.co/{slug}",
+    "ashby": "https://jobs.ashbyhq.com/{slug}",
+    "smartrecruiters": "https://careers.smartrecruiters.com/{slug}",
+}
+
+
+def board_url(ats: str, board: Board) -> str:
+    return board.url or BOARD_URLS[ats].format(slug=board.slug)
 
 
 def _require_host(page: Page, host: str, board: Board) -> None:
@@ -48,7 +63,7 @@ def _job(board: Board, title: str, location: str, url: str, **extra: str | None)
 
 # Greenhouse: job-boards.greenhouse.io renders rows server-side, paginated.
 async def scrape_greenhouse(page: Page, board: Board) -> list[ScrapedJob]:
-    await page.goto(board.url or f"https://job-boards.greenhouse.io/{board.slug}", wait_until="networkidle", timeout=NAV_TIMEOUT_MS)
+    await page.goto(board_url("greenhouse", board), wait_until="networkidle", timeout=NAV_TIMEOUT_MS)
     _require_host(page, "greenhouse.io", board)
 
     jobs: list[ScrapedJob] = []
@@ -76,7 +91,7 @@ async def scrape_greenhouse(page: Page, board: Board) -> list[ScrapedJob]:
 
 # Lever: every posting is on one server-rendered page.
 async def scrape_lever(page: Page, board: Board) -> list[ScrapedJob]:
-    await page.goto(board.url or f"https://jobs.lever.co/{board.slug}", wait_until="domcontentloaded", timeout=NAV_TIMEOUT_MS)
+    await page.goto(board_url("lever", board), wait_until="domcontentloaded", timeout=NAV_TIMEOUT_MS)
     _require_host(page, "lever.co", board)
     rows = await page.eval_on_selector_all(
         ".posting",
@@ -91,7 +106,7 @@ async def scrape_lever(page: Page, board: Board) -> list[ScrapedJob]:
 
 # Ashby: the board page loads its postings from a GraphQL call; read that.
 async def scrape_ashby(page: Page, board: Board) -> list[ScrapedJob]:
-    url = board.url or f"https://jobs.ashbyhq.com/{board.slug}"
+    url = board_url("ashby", board)
     payloads = await capture_json(page, url, "op=ApiJobBoardWithTeams")
     _require_host(page, "ashbyhq.com", board)
     jobs: list[ScrapedJob] = []
@@ -189,7 +204,7 @@ async def _workday_locations(page: Page, endpoint: str, path: str) -> str | None
 # links. Boards group by location *or* by department; in the second case the
 # heading is not a location, so each job page is asked for its address.
 async def scrape_smartrecruiters(page: Page, board: Board) -> list[ScrapedJob]:
-    await page.goto(board.url or f"https://careers.smartrecruiters.com/{board.slug}", wait_until="networkidle", timeout=NAV_TIMEOUT_MS)
+    await page.goto(board_url("smartrecruiters", board), wait_until="networkidle", timeout=NAV_TIMEOUT_MS)
     _require_host(page, "smartrecruiters.com", board)
 
     for _ in range(MAX_PAGES):
@@ -236,6 +251,54 @@ async def _smartrecruiters_location(page: Page, job_url: str) -> tuple[str, str 
     address = re.search(r'formattedAddress="([^"]*)"', html)
     country = re.search(r'itemprop="addressCountry" content="([^"]*)"', html)
     return (address.group(1) if address else ""), (country.group(1) if country else None)
+
+
+# Company logos (spec 010). Every board names its company's logo in the HTML
+# the server sends; checked live on 2026-10-05. Images are blocked in the
+# browser context, so the URL is read from markup, never from a loaded <img>.
+_OG_IMAGE = re.compile(r"<meta\b[^>]*\bproperty=[\"']og:image[\"'][^>]*>", re.I)
+_CONTENT = re.compile(r"\bcontent=[\"']([^\"']+)[\"']", re.I)
+_LEVER_LOGO = re.compile(r"class=[\"']main-header-logo[\"'][^>]*>\s*<img\b[^>]*\bsrc=[\"']([^\"']+)[\"']", re.I)
+_ASHBY_LOGO = re.compile(r"\"logoSquareImageUrl\":\"([^\"]+)\"")
+
+
+def _og_image(page_html: str) -> str | None:
+    tag = _OG_IMAGE.search(page_html)
+    found = _CONTENT.search(tag.group(0)) if tag else None
+    return found.group(1) if found else None
+
+
+def logo_from_html(ats: str, page_html: str) -> str | None:
+    """The company's logo URL on a board page, or None if the board shows none."""
+    url: str | None
+    if ats == "greenhouse":
+        # A board logo lives under /logos/; anything else is a banner or the company site's share image.
+        url = _og_image(page_html)
+        url = url if url and "/logos/" in url else None
+    elif ats == "lever":
+        url = (m := _LEVER_LOGO.search(page_html)) and m.group(1)
+    elif ats == "ashby":
+        # The square mark; the wordmark is too wide for a logo tile.
+        url = (m := _ASHBY_LOGO.search(page_html)) and m.group(1).replace("\\u002F", "/")
+    elif ats == "workday":
+        url = _og_image(page_html)
+    elif ats == "smartrecruiters":
+        # Boards without a logo fall back to SmartRecruiters' own image.
+        url = _og_image(page_html)
+        url = url if url and "sr-company-logo" in url else None
+    else:
+        url = None
+    url = html.unescape(url).strip() if url else None
+    return url if url and url.startswith("https://") else None
+
+
+async def board_logo(request: APIRequestContext, ats: str, url: str) -> str | None:
+    """Fetch a board's HTML and read its logo. Never raises: a missing logo is not a failed board."""
+    try:
+        response = await request.get(url, timeout=NAV_TIMEOUT_MS)
+        return logo_from_html(ats, await response.text()) if response.ok else None
+    except Exception:
+        return None
 
 
 SCRAPERS: dict[str, Callable[[Page, Board], Awaitable[list[ScrapedJob]]]] = {
