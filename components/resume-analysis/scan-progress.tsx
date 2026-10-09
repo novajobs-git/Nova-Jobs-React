@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { CircleCheckIcon, CircleDashedIcon, FileTextIcon, LoaderCircleIcon } from "lucide-react"
+import { CircleCheckIcon, CircleDashedIcon, LoaderCircleIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { PdfFileIcon } from "@/components/icons/pdf-file-icon"
 import type { Analysis } from "@/lib/resume/analysis"
 import { cn } from "@/lib/utils"
 
@@ -72,7 +73,7 @@ export function ScanProgress({ fileName, analysis, canSkip, onDone, onCancel }: 
   return (
     <section aria-labelledby="scan-title" className="border bg-card">
       <div className="flex items-center gap-3 border-b px-4 py-3 md:px-5">
-        <FileTextIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+        <PdfFileIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
         <p className="min-w-0 flex-1 truncate text-sm font-medium">{fileName}</p>
         {canSkip && analysis && !finished && (
           <Button variant="outline" size="sm" onClick={onDone}>

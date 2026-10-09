@@ -1,9 +1,10 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { FileTextIcon, LoaderCircleIcon, UploadIcon } from "lucide-react"
+import { LoaderCircleIcon, UploadIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { PdfFileIcon } from "@/components/icons/pdf-file-icon"
 import { cn } from "@/lib/utils"
 import type { ParsedResume } from "@/lib/profile/schema"
 
@@ -52,9 +53,7 @@ export function ResumeDropzone({ fileName, skillCount, onUploaded, invalid }: Re
       />
       {fileName && !busy ? (
         <div className="flex items-center gap-4 rounded-xl border bg-card p-4">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary-hover">
-            <FileTextIcon className="size-5" aria-hidden />
-          </span>
+          <PdfFileIcon className="size-7 shrink-0 text-muted-foreground" aria-hidden />
           <div className="min-w-0 flex-1">
             <p className="truncate text-[15px] font-semibold">{fileName}</p>
             <p className="text-sm text-muted-foreground tabular-nums">

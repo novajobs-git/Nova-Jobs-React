@@ -1,10 +1,11 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { FileTextIcon, UploadIcon } from "lucide-react"
+import { UploadIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import { PdfFileIcon } from "@/components/icons/pdf-file-icon"
 import { cn } from "@/lib/utils"
 
 const MAX_BYTES = 5 * 1024 * 1024
@@ -89,7 +90,7 @@ export function UploadPanel({ storedFileName, onFile, onStored }: UploadPanelPro
 
       {storedFileName && (
         <div className="flex flex-wrap items-center gap-3 border-t px-4 py-3 md:px-5">
-          <FileTextIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+          <PdfFileIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
           <p className="min-w-0 flex-1 truncate text-sm">
             <span className="text-muted-foreground">On file: </span>
             <span className="font-medium">{storedFileName}</span>

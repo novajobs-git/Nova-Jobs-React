@@ -1,71 +1,32 @@
-import type { Application, ApplicationStatus, Ats, Outcome } from "./types"
-
-export const OUTCOMES: Outcome[] = ["applied", "in_queue", "needs_review", "failed"]
-
-export function outcomeOf(status: ApplicationStatus): Outcome {
-  return status === "queued" || status === "applying" ? "in_queue" : status
-}
-
-export function countByOutcome(apps: Application[]): Record<Outcome, number> {
-  const counts: Record<Outcome, number> = { applied: 0, in_queue: 0, needs_review: 0, failed: 0 }
-  for (const app of apps) counts[outcomeOf(app.status)]++
-  return counts
-}
+import type { Application } from "./types"
 
 const DAY = 24 * 60 * 60 * 1000
 
-export function appliedSince(apps: Application[], now: Date, days: number): number {
-  const cutoff = now.getTime() - days * DAY
-  return apps.filter((a) => a.status === "applied" && Date.parse(a.updatedAt) >= cutoff).length
-}
-
-export interface DailyActivity {
+export interface DayCount {
+  /** yyyy-mm-dd, local time. */
   date: string
+  /** e.g. "Oct 5". */
   label: string
-  applied: number
-  needs_review: number
-  failed: number
+  value: number
 }
 
-/** Finished attempts per day, oldest first. In-queue items have no outcome yet. */
-export function dailyActivity(apps: Application[], now: Date, days: number): DailyActivity[] {
-  const buckets: DailyActivity[] = []
+const localDate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+
+/** Submitted applications per day for the last `days` days, oldest first. */
+export function appliedPerDay(apps: Application[], now: Date, days: number): DayCount[] {
+  const buckets: DayCount[] = []
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(now.getTime() - i * DAY)
-    buckets.push({
-      date: d.toISOString().slice(0, 10),
-      label: d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" }),
-      applied: 0,
-      needs_review: 0,
-      failed: 0,
-    })
+    buckets.push({ date: localDate(d), label: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }), value: 0 })
   }
+  const byDate = new Map(buckets.map((b) => [b.date, b]))
   for (const app of apps) {
-    const outcome = outcomeOf(app.status)
-    if (outcome === "in_queue") continue
-    const bucket = buckets.find((b) => b.date === app.updatedAt.slice(0, 10))
-    if (bucket) bucket[outcome]++
+    if (app.status !== "applied") continue
+    const bucket = byDate.get(localDate(new Date(app.updatedAt)))
+    if (bucket) bucket.value++
   }
   return buckets
-}
-
-export interface AtsBreakdown {
-  ats: Ats
-  applied: number
-  attempted: number
-}
-
-/** Success rate per ATS, so the candidate can see where applications stall. */
-export function byAts(apps: Application[]): AtsBreakdown[] {
-  const map = new Map<Ats, AtsBreakdown>()
-  for (const app of apps) {
-    if (outcomeOf(app.status) === "in_queue") continue
-    const row = map.get(app.ats) ?? { ats: app.ats, applied: 0, attempted: 0 }
-    row.attempted++
-    if (app.status === "applied") row.applied++
-    map.set(app.ats, row)
-  }
-  return [...map.values()].sort((a, b) => b.attempted - a.attempted)
 }
 
 export function relativeTime(iso: string, now: Date): string {

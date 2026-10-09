@@ -12,7 +12,7 @@ type Errors = Partial<Record<"email" | "password", string>>
 
 /*
  * UI-only sign-in until Clerk exists: validates the form, then hands off to
- * /jobs, which sends candidates without a profile on to onboarding.
+ * /dashboard, whose layout sends candidates without a profile to onboarding.
  */
 export function LoginForm() {
   const router = useRouter()
@@ -28,7 +28,7 @@ export function LoginForm() {
     setErrors(next)
     if (Object.keys(next).length) return
     setSubmitting(true)
-    router.push("/jobs")
+    router.push("/dashboard")
   }
 
   return (

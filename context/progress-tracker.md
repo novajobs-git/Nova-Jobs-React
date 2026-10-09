@@ -399,3 +399,89 @@ code is implemented.
   engine port exists in `engine/` but the app-side wiring was blocked
   pending the user's explicit approval for live application submission.
   Built `specs/013-resume-analysis.md` (`/resume-analysis`).
+- **2026-10-05** — Navigation restructure (user request): the Applications
+  page is now the Dashboard (`/dashboard`, stats + history); the former
+  dashboard (matched jobs) is the Jobs page (`/jobs`). `/applications` is
+  removed. Login lands on `/dashboard`; onboarding still lands on `/jobs`.
+- **2026-10-05** — Removed all demo data (mock applications, demo jobs,
+  DEMO_NOW, the plan badge) and every old dashboard component. The
+  Dashboard's first and only component is "Applications by day", a Tremor
+  SparkAreaChart (single series, gradient) over submitted applications.
+  Applications aren't persisted yet, so it stays empty until the queue store
+  and engine land.
+- **2026-10-05** — Spec 012 built on the user's explicit request: the
+  Auto-Apply toggle starts `engine/worker.py`; Apply queues real jobs;
+  Workbench rows have Pause/Resume and Cancel. **Decision (user): the
+  engine uses Hyperbrowser.** Its stealth and CAPTCHA-solving options are
+  kept off and NopeCHA is not ported; CAPTCHAs are solved by the candidate
+  in the Hyperbrowser live view. "Apply to matches automatically" (Settings,
+  off by default, capped by DAILY_LIMIT) departs from PRODUCT.md's
+  "one click at a time" positioning at the user's request.
+- **2026-10-06** — Auto-Apply is per candidate (user request): settings,
+  status, log, queue and worker are keyed by candidate id
+  (`lib/candidate.ts`, `engine.store.Candidate`). The `AUTO_SUBMIT` env var
+  is replaced by the per-candidate "Submit applications automatically"
+  setting (off by default).
+- **2026-10-06** — Auto-Apply rework planned (user brief "AUTO-APPLY
+  MODULE"). Confirmed decisions:
+  1. **CAPTCHA:** Hyperbrowser stealth and auto-solving stay off (no
+     detection evasion). A CAPTCHA pauses the run; the candidate solves it
+     in the popup's live view; unsolved after 3 min -> needs_review.
+  2. **Ranking:** rank = 0.7 x match% + 0.3 x freshness, freshness =
+     100 x 0.5^(age_days / 7), age from posted_at else first_seen_at;
+     stale/expired hidden; 30% match minimum unchanged.
+  3. **Scrape schedule:** `scripts.daily_ingest` (plain Playwright, never
+     Hyperbrowser) run by Windows Task Scheduler / cron. Edge Functions
+     can't run Chromium.
+  4. **Supabase first:** spec 007 (schema, migration written) -> 008
+     (wiring + one-time import of data/) -> 014 (per-job Apply popup,
+     ATS adapters, hyper_agent fallback) -> 015 (daily ingest + ranking).
+  Live progress uses Realtime broadcast on `run:<run_id>` until Clerk JWT
+  auth enables RLS-scoped postgres_changes. Per-job model removes the
+  top-bar toggle and "Apply to matches automatically" (assumption stated
+  to the user).
+- **2026-10-06** — Supabase: the project in .env is the OLD app's live
+  database (users, profiles, 150k jobs, job_matches, job_queue...). User
+  decisions: reuse + additive schema (spec 007 rewritten; migration
+  `20261006000000_novajobs_additive.sql`), local candidate = existing
+  `users` row by email, top-bar toggle kept as start/stop for the whole
+  queue, jobs pool rebuilt with tech roles only (`scripts/ats/job_family.py`,
+  scraper filters by default). Applying the migration from the agent was
+  blocked (shared resource); the user applies it. Pending confirmation:
+  expire vs hard-delete the existing 150k jobs (hard delete cascades into
+  the old app's job_matches).
+- **2026-10-07** — Spec 007 migration applied to the live Supabase project
+  with the user's approval; existing row counts unchanged. Still pending:
+  expire vs hard-delete the old 150,364 jobs, then the tech-only scrape into
+  the pool and spec 008 wiring.
+- **2026-10-07** — User-approved hard delete: all 150,364 rows of
+  `public.jobs` deleted (cascade removed the old app's 3,000 job_matches).
+  Verified backups first: `data/backups/2026-10-07-before-jobs-delete/`
+  (jobs.csv.gz 150,364 rows, job_matches.csv.gz 3,000 rows). Next: tech-only
+  scrape into the pool, then spec 008.
+- **2026-10-07** — Local pool rebuilt (old pool + matches moved to
+  `data/backups/2026-10-07-local-pool/`): curated big-company boards
+  (`scripts/ats/boards.py` CURATED, default; `--sample` for random), tech
+  roles only, public board APIs first for Greenhouse/Ashby/Lever
+  (`scripts/ats/apis.py`, also bring descriptions + posting dates).
+  2,754 jobs from 48 companies. Job lists use the confirmed freshness rank
+  and are diversified by company (each company's best job before any
+  company's second) in `lib/jobs/matches.ts`. Workday boards were in
+  maintenance during the scrape (137 jobs). Still local files until spec 008.
+- **2026-10-07** — `specs/014-structured-matching.md` built (decisions
+  confirmed by the user: tiers New Grad → VP, visible range target − 1 to
+  target + 1, years buffer +2, degree filter, title cutoff 0.89 (fallback
+  0.87, calibrated on "AI Engineer"), weights 30/30/20/10/10, minimum 15
+  results with relaxation level → degree → title). Requirement extraction
+  and title embeddings are computed once at ingestion
+  (`scripts/extract_requirements.py`, `scripts/embed_titles.py`,
+  `scripts/daily_ingest.py`); shared Gemini helper `engine/gemini.py`.
+  Supabase migration `20261007000000_structured_matching.sql` applied with
+  the user's approval (pgvector 0.8.2 in `extensions`, additive columns;
+  row counts unchanged). The scraper now merges re-seen jobs, so
+  descriptions and requirements survive a re-scrape. Demo candidate: 237
+  matches (was 1,982), none at Staff or VP. Blocker: the Gemini project hit
+  its monthly spend cap mid-session; the candidate's "AI Engineer" vector
+  was seeded from the calibration run (same model and settings). Spec
+  numbering: the per-job Apply popup becomes 015 and the ingestion
+  schedule/stale marking 016.

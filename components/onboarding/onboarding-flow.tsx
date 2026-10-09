@@ -18,21 +18,25 @@ import { ChoiceGroup } from "@/components/onboarding/choice-group"
 import { ResumeDropzone } from "@/components/onboarding/resume-dropzone"
 import { cn } from "@/lib/utils"
 import {
+  DEFAULT_LEVEL,
   DISABILITY_STATUS,
   EEO_DEFAULTS,
   EXPERIENCE_YEARS,
   GENDER,
+  HIGHEST_DEGREE,
   RACE_ETHNICITY,
+  TARGET_LEVELS,
   VETERAN_STATUS,
   WORK_MODES,
   YES_NO,
 } from "@/lib/profile/options"
 import { onboardingSchema, stepSchemas, type OnboardingData, type ParsedResume, type StepKey } from "@/lib/profile/schema"
 
-type Draft = Partial<OnboardingData>
-type Errors = Partial<Record<string, string>>
+export type Draft = Partial<OnboardingData>
+export type Errors = Partial<Record<string, string>>
 
-const STEPS: { key: StepKey | "review"; title: string; subtitle?: string; section: string }[] = [
+/** Onboarding steps; My Details (app/(dashboard)/details) reuses their titles and bodies. */
+export const STEPS: { key: StepKey | "review"; title: string; subtitle?: string; section: string }[] = [
   { key: "resume", title: "Upload your resume", section: "Resume" },
   { key: "about", title: "About you", section: "About you" },
   { key: "links", title: "Your links", subtitle: "Optional", section: "Links" },
@@ -82,6 +86,7 @@ export function OnboardingFlow() {
   const onResume = (resume: ParsedResume) => {
     setDraft((d) => {
       const filled = { ...d, resumeId: resume.resumeId, resumeFileName: resume.fileName, skills: resume.skills }
+      if (resume.highestDegree && !d.highestDegree) filled.highestDegree = resume.highestDegree
       // Pre-fill only what the candidate hasn't typed themselves.
       for (const [k, v] of Object.entries(resume.contact) as [keyof ParsedResume["contact"], string | undefined][]) {
         if (v && !d[k]) filled[k] = v
@@ -214,7 +219,7 @@ interface StepBodyProps {
   onEdit: (index: number) => void
 }
 
-function StepBody({ stepKey, draft, set, errors, onResume, onEdit }: StepBodyProps) {
+export function StepBody({ stepKey, draft, set, errors, onResume, onEdit }: StepBodyProps) {
   switch (stepKey) {
     case "resume":
       return (
@@ -281,20 +286,30 @@ function StepBody({ stepKey, draft, set, errors, onResume, onEdit }: StepBodyPro
           </fieldset>
           <div className="grid gap-5 sm:grid-cols-2">
             <TextField id="currentTitle" label="Current or last job title" draft={draft} set={set} errors={errors} />
-            <FieldShell id="yearsExperience" label="Years of experience" error={errors.yearsExperience}>
-              <Select value={draft.yearsExperience ?? ""} onValueChange={(v) => set("yearsExperience", v as OnboardingData["yearsExperience"])}>
-                <SelectTrigger id="yearsExperience" className="h-11! w-full bg-card" aria-invalid={!!errors.yearsExperience || undefined}>
-                  <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent>
-                  {EXPERIENCE_YEARS.map((y) => (
-                    <SelectItem key={y} value={y}>
-                      {y} years
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FieldShell>
+            <SelectField
+              id="yearsExperience"
+              label="Years of experience"
+              options={EXPERIENCE_YEARS}
+              format={(y) => `${y} years`}
+              draft={draft}
+              errors={errors}
+              onChange={(years) => {
+                // Follow the years with the level until the candidate picks one themselves.
+                const followsYears = !draft.targetLevel || (draft.yearsExperience && draft.targetLevel === DEFAULT_LEVEL[draft.yearsExperience])
+                set("yearsExperience", years)
+                if (followsYears) set("targetLevel", DEFAULT_LEVEL[years])
+              }}
+            />
+            <SelectField
+              id="targetLevel"
+              label="Level you’re targeting"
+              hint="You’ll see jobs at this level and one above."
+              options={TARGET_LEVELS}
+              draft={draft}
+              errors={errors}
+              onChange={(v) => set("targetLevel", v)}
+            />
+            <SelectField id="highestDegree" label="Highest degree" options={HIGHEST_DEGREE} draft={draft} errors={errors} onChange={(v) => set("highestDegree", v)} />
             <TextField id="desiredSalary" label="Desired salary (USD / year)" placeholder="120,000" inputMode="numeric" draft={draft} set={set} errors={errors} />
             <TextField id="earliestStartDate" label="Earliest start date" type="date" draft={draft} set={set} errors={errors} />
           </div>
@@ -378,13 +393,55 @@ function TextField({ id, label, draft, set, errors, className, ...input }: TextF
   )
 }
 
-function FieldShell({ id, label, error, className, children }: { id: string; label: string; error?: string; className?: string; children: React.ReactNode }) {
+type SelectKey = "yearsExperience" | "targetLevel" | "highestDegree"
+
+interface SelectFieldProps<K extends SelectKey> {
+  id: K
+  label: string
+  hint?: string
+  options: readonly OnboardingData[K][]
+  format?: (option: OnboardingData[K]) => string
+  draft: Draft
+  errors: Errors
+  onChange: (value: OnboardingData[K]) => void
+}
+
+function SelectField<K extends SelectKey>({ id, label, hint, options, format = String, draft, errors, onChange }: SelectFieldProps<K>) {
+  return (
+    <FieldShell id={id} label={label} error={errors[id]} hint={hint}>
+      <Select value={draft[id] ?? ""} onValueChange={(v) => onChange(v as OnboardingData[K])}>
+        <SelectTrigger
+          id={id}
+          className="h-11! w-full bg-card"
+          aria-invalid={!!errors[id] || undefined}
+          aria-describedby={hint ? `${id}-hint` : undefined}
+        >
+          <SelectValue placeholder="Select" />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((o) => (
+            <SelectItem key={o} value={o}>
+              {format(o)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </FieldShell>
+  )
+}
+
+function FieldShell({ id, label, hint, error, className, children }: { id: string; label: string; hint?: string; error?: string; className?: string; children: React.ReactNode }) {
   return (
     <div className={cn("grid gap-2", className)}>
       <Label htmlFor={id} className="text-sm font-medium">
         {label}
       </Label>
       {children}
+      {hint && !error && (
+        <p id={`${id}-hint`} className="text-sm text-muted-foreground">
+          {hint}
+        </p>
+      )}
       <FieldError id={`${id}-error`} message={error} />
     </div>
   )
@@ -428,6 +485,8 @@ function Review({ draft, onEdit }: { draft: Draft; onEdit: (index: number) => vo
         ["Locations", join(draft.targetLocations)],
         ["Work setup", join(draft.workModes)],
         ["Experience", draft.yearsExperience ? `${draft.yearsExperience} years` : "—"],
+        ["Target level", draft.targetLevel ?? "—"],
+        ["Highest degree", draft.highestDegree ?? "—"],
         ["Salary", draft.desiredSalary ? `$${draft.desiredSalary}` : "—"],
         ["Start date", draft.earliestStartDate || "—"],
       ],

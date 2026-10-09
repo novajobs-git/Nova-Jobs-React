@@ -1,11 +1,7 @@
 import type { Ats, Sponsorship } from "@/lib/applications/types"
+import type { Relaxation, TargetLevel, WorkMode } from "@/lib/matching/structured"
 
-export type ExperienceLevel = "Entry" | "Mid" | "Senior"
-
-export type WorkMode = "Remote" | "Hybrid" | "On-site"
-
-/** Jobs below this match score are never shown to a candidate. */
-export const MATCH_THRESHOLD = 30
+export type { WorkMode }
 
 export interface Job {
   id: string
@@ -15,10 +11,11 @@ export interface Job {
   role: string
   location: string
   workMode: WorkMode
-  level: ExperienceLevel
+  /** Seniority extracted at ingestion (spec 014); absent until extraction has run. */
+  level?: TargetLevel
   ats: Ats
   sponsorship: Sponsorship
-  /** Always >= MATCH_THRESHOLD. */
+  /** Weighted match score 0-100 (spec 014: title, skills, freshness, location, salary). */
   matchScore: number
   /** USD per year, when the posting states it. */
   salary?: { min: number; max: number }
@@ -28,6 +25,14 @@ export interface Job {
   skillTotal?: number
   /** Why this job matched the candidate's profile. */
   matchReasons: string[]
+  /** Filters relaxed to include this job because there were too few exact matches (spec 014). */
+  relaxedBy?: Relaxation[]
   postedAt: string
   postingUrl: string
+}
+
+/** The candidate's matches, plus which filters had to be relaxed to find enough of them. */
+export interface MatchedJobs {
+  jobs: Job[]
+  relaxed: Relaxation[]
 }

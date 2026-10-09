@@ -1,6 +1,8 @@
 "use client"
 
-import { CompanyLogo, JobAction, MatchPill } from "@/components/jobs/job-parts"
+import { Building2Icon, MapPinIcon } from "lucide-react"
+
+import { CompanyLogo, JobAction, MatchPill, RelaxedTags } from "@/components/jobs/job-parts"
 import type { Application } from "@/lib/applications/types"
 import type { Job } from "@/lib/jobs/types"
 
@@ -32,11 +34,24 @@ export function TopMatches({ jobs, total, applicationFor }: TopMatchesProps) {
                   <CompanyLogo src={job.companyLogo} />
                   <div className="min-w-0 flex-1">
                     <h3 className="truncate text-sm leading-5 font-semibold" title={job.role}>{job.role}</h3>
-                    <p className="mt-0.5 truncate text-sm text-muted-foreground">{job.company}</p>
+                    <RelaxedTags relaxedBy={job.relaxedBy} className="mt-1.5" />
                   </div>
                   <MatchPill score={job.matchScore} />
                 </div>
-                <p className="mt-3 text-sm text-muted-foreground">{job.location}</p>
+                <dl className="mt-3 grid gap-1 text-sm text-muted-foreground">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <dt>
+                      <Building2Icon className="size-4 shrink-0" aria-label="Company" />
+                    </dt>
+                    <dd className="truncate">{job.company}</dd>
+                  </div>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <dt>
+                      <MapPinIcon className="size-4 shrink-0" aria-label="Location" />
+                    </dt>
+                    <dd className="truncate" title={job.location}>{job.location}</dd>
+                  </div>
+                </dl>
                 {job.matchedSkills && job.matchedSkills.length > 0 && (
                   <div className="mt-3">
                     <p className="text-xs font-medium text-muted-foreground tabular-nums">

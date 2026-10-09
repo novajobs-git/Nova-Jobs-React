@@ -2,3 +2,7 @@ playwright>=1.48
 ats-scrapers>=0.3
 pandas>=2.2
 pyarrow>=17
+requests>=2.32
+python-dotenv>=1.0
+pypdf>=5.0
+hyperbrowser>=1.9

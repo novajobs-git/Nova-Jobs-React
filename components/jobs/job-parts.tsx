@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { BadgeCheckIcon, CircleHelpIcon, CircleSlashIcon } from "lucide-react"
+import { BadgeCheckIcon, CircleHelpIcon, CircleSlashIcon, InfoIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,7 @@ import { StatusLabel } from "@/components/applications/status"
 import { cn } from "@/lib/utils"
 import type { Application, Sponsorship } from "@/lib/applications/types"
 import type { Job } from "@/lib/jobs/types"
+import { RELAXED_COPY, type Relaxation } from "@/lib/matching/structured"
 
 const SPONSORSHIP = {
   offered: { label: "Sponsors visas", icon: BadgeCheckIcon, className: "text-success-text" },
@@ -35,21 +36,28 @@ export function formatSalary(salary: Job["salary"]) {
 
 /** Apply button, or the job's place in the pipeline once it has one. */
 export function JobAction({ job, application, className }: { job: Job; application?: Application; className?: string }) {
-  const { apply } = useApplications()
+  const { apply, autoApply } = useApplications()
+  const [busy, setBusy] = useState(false)
 
   if (application) return <StatusLabel status={application.status} />
 
   return (
     <Button
       className={cn("h-9 px-4 text-[15px]", className)}
-      onClick={() => {
-        const place = apply(job)
+      disabled={busy}
+      onClick={async () => {
+        setBusy(true)
+        const place = await apply(job)
+        setBusy(false)
+        if (place === null) return
         toast.success(`Queued: ${job.role}`, {
-          description: `${job.company} is #${place} in line. Track it in the Auto-Apply Queue.`,
+          description: autoApply
+            ? `${job.company} is #${place} in line. Track it in the Auto-Apply Queue.`
+            : `${job.company} is #${place} in line. Turn on Auto-Apply to start.`,
         })
       }}
     >
-      Apply
+      {busy ? "Queuing…" : "Apply"}
     </Button>
   )
 }
@@ -85,6 +93,34 @@ export function CompanyLogo({ src, className }: { src?: string; className?: stri
         // eslint-disable-next-line @next/next/no-img-element
         <img src={PLACEHOLDER_LOGO} alt="" className="size-5 opacity-55 dark:invert" />
       )}
+    </span>
+  )
+}
+
+/** Shown when too few exact matches were found and filters were relaxed (spec 014). */
+export function RelaxedNotice({ relaxed }: { relaxed: Relaxation[] }) {
+  return (
+    <div role="status" className="flex gap-3 rounded-panel border bg-card px-5 py-4 text-sm">
+      <InfoIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />
+      <ul className="grid gap-1">
+        {relaxed.map((r) => (
+          <li key={r}>{RELAXED_COPY[r].banner}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+/** Text tags naming why a relaxed-in job is shown; never color alone. */
+export function RelaxedTags({ relaxedBy, className }: { relaxedBy?: Relaxation[]; className?: string }) {
+  if (!relaxedBy?.length) return null
+  return (
+    <span className={cn("inline-flex flex-wrap gap-1.5", className)}>
+      {relaxedBy.map((r) => (
+        <span key={r} className="rounded-none border border-dashed px-2 py-0.5 text-xs font-medium text-muted-foreground">
+          {RELAXED_COPY[r].tag}
+        </span>
+      ))}
     </span>
   )
 }

@@ -24,6 +24,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Python job ingestion (venv at `.venv` from `scripts/requirements.txt`, plus `python -m playwright install chromium`):
 - `.venv\Scripts\python -m scripts.scrape_jobs --boards 15` (options: `--ats`, `--slug`, `--concurrency`, `--seed`, `--headed`) writes `data/jobs/us-jobs.json`, merged and deduped across runs
 - `.venv\Scripts\python -m scripts.enrich_descriptions` adds job descriptions, which keyword matching needs. It's resumable.
+- `.venv\Scripts\python -m scripts.extract_requirements` extracts seniority, years, degree and salary once per job; Gemini runs only when the rules find neither a level nor years. Then `.venv\Scripts\python -m scripts.embed_titles` embeds new titles. Both skip work already done.
+- `.venv\Scripts\python -m scripts.daily_ingest [--skip-scrape]` runs all of the above in order.
 
 ## Architecture
 
@@ -33,17 +35,21 @@ The target stack is Clerk + Supabase + a Python apply engine. **None of it is wi
 |---|---|---|
 | Candidate profile + resume | `data/profiles/candidate.json`, `data/resumes/<uuid>.pdf/.txt` | `lib/profile/store.ts` → `getProfile()`, `saveProfile()`, `saveResume()` |
 | Job pool (central, shared by all candidates) | `data/jobs/us-jobs.json` from the Python scrapers; logos downloaded to `data/logos/`, served at `/logos/<file>` | `lib/jobs/pool.ts` → `loadPool()` |
-| Candidate matches | `data/matches/candidate.json`, written on onboarding and resume save, recomputed when the pool or skills change; demo jobs if no pool | `lib/jobs/matches.ts` → `matchCandidate()`, `getMatchedJobs(profile)` |
-| Applications | synthetic `lib/applications/mock-data.ts` | `getApplications()` |
-| Apply queue | client-side `ApplicationsProvider` context (resets on reload) | `components/applications/applications-provider.tsx` |
+| Candidate matches | `data/matches/candidate.json`, written on onboarding and resume save, recomputed when the pool or skills change; empty if no pool | `lib/jobs/matches.ts` → `matchCandidate()`, `getMatchedJobs(profile)` |
+| Applications + queue (per candidate) | `data/applications/<id>.json`, changed by the app and that candidate's Python engine under `<id>.lock`; Auto-Apply settings/status/log in `data/engine/{settings,status,logs}/<id>`; id from `lib/candidate.ts` | `lib/applications/store.ts`, `lib/applications/queue.ts`, `lib/engine/store.ts`, `engine/` (spec 012) |
 
 `data/` is generated at runtime. To restart onboarding, delete `data/profiles/candidate.json`.
 
-**Flow:** `/` → `/login` (UI only: validates the form and goes to `/jobs`; no real auth) → `app/(dashboard)/` (`/jobs`, `/applications`). The dashboard layout *and* each page redirect to `/onboarding` until `onboarding_complete`. Pages need their own check because layouts and pages render in parallel.
+**Flow:** `/` → `/login` (UI only: validates the form and goes to `/dashboard`; no real auth) → `app/(dashboard)/`: `/dashboard` (application stats and history), `/jobs` (matched jobs), `/resume`, `/resume-analysis`. Finishing onboarding lands on `/jobs`. The dashboard layout *and* pages that read the profile redirect to `/onboarding` until `onboarding_complete`; pages need their own check because layouts and pages render in parallel.
 
 **Onboarding** (`components/onboarding/onboarding-flow.tsx`) is a client-side multi-step form. Each step validates against `stepSchemas[step]` in `lib/profile/schema.ts`. The resume PDF goes to `POST /api/resume`, which extracts text with `unpdf`, parses contact info and skills, and returns a `resumeId`. Finishing posts the full `onboardingSchema` payload to `POST /api/profile`. `store.ts` is the single place that maps camelCase to snake_case. Profiles are stored in the snake_case shape the Python engine reads.
 
-**Matching** (`lib/matching/`): keyword overlap between the resume skills and keywords extracted from the job description. `scoreJob` returns null under `MIN_MATCHED_KEYWORDS`, and jobs below `MATCH_THRESHOLD` (30%) are hidden.
+**Matching** (spec 014, `lib/matching/structured.ts` + `lib/jobs/matches.ts`) has two stages:
+- **Hard filters:** title-embedding similarity ≥ 0.89; seniority from target − 1 to target + 1; required years ≤ candidate years + 2; a required Master's or PhD the candidate doesn't hold excludes the job.
+- **Relaxation:** when fewer than 15 jobs survive, filters relax one step at a time: level, then degree, then title. Relaxed jobs carry `relaxedBy`, and the Jobs page shows a banner plus a text tag on each one.
+- **Score:** 0.30 title + 0.30 skills (keyword overlap, spec 006) + 0.20 freshness + 0.10 location + 0.10 salary. Unknown components are dropped and the rest rescaled.
+- **Inputs computed once:** job requirements (`scripts/extract_requirements.py`) and title embeddings (`scripts/embed_titles.py`) at ingestion, and the candidate's target-title embeddings on save (`data/embeddings/`). Opening the Jobs page doesn't call Gemini.
+- `normalizeTitle` (`lib/matching/titles.ts`) mirrors `normalize_title` in `scripts/ats/requirements.py`. Change both together.
 
 **API routes** return the envelope `{ success, data?, error? }`, validate with Zod, and stay thin (logic lives in `lib/`). They have a placeholder comment where the Clerk auth check will go.
 

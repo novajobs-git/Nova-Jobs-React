@@ -12,11 +12,14 @@ CHANGED FOR THE REBUILD:
 - No Supabase: the answer cache is data/engine/qa_cache.json; the profile,
   resume and queue come from the Next.js app's local stores (engine/store.py).
 - No scraping / TF-IDF: jobs come from the central pool via the queue.
-- No NopeCHA or any other automated CAPTCHA solving (the old no-evasion
-  principle in context/architecture.md stands). When a form shows a
-  CAPTCHA, the engine waits for the candidate to solve it in the visible
-  window, then submits; if nobody does, the job goes to Needs review with
-  that reason.
+- The browser is a Hyperbrowser cloud session (HYPERBROWSER_API_KEY), or a
+  local visible Chromium when no key is set. Stealth and Hyperbrowser's
+  CAPTCHA solving stay OFF, and there is no NopeCHA: when a form shows a
+  CAPTCHA the engine waits for the candidate to solve it in the session's
+  live view, then submits; if nobody does, the job goes to Needs review.
+- The resume is uploaded as file contents, which works with a remote browser.
+- Pause/Cancel: stop() is checked between steps and in every wait; it raises
+  Cancelled so the worker can park or drop the application.
 - apply_to_job() returns (outcome, reason) so every failure carries its
   real reason, and reports each step through `report`.
 """
@@ -31,25 +34,32 @@ import re
 import shutil
 import tempfile
 import time
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Iterator
 
 import requests
 from dotenv import load_dotenv
 from playwright.sync_api import sync_playwright
 
+from engine.gemini import GEMINI_API_KEY, GEMINI_URL
 from engine.store import DATA, read_json, write_json
 
 load_dotenv()
-
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest")
-GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
 
 QA_CACHE = DATA / "engine" / "qa_cache.json"
 NA = "N/A"
 
 Report = Callable[[str], None]
+Stop = Callable[[], bool]
+
+
+class Cancelled(Exception):
+    """The candidate paused or cancelled the application mid-run."""
+
+
+def _resume_payload(resume_path: str) -> dict:
+    return {"name": Path(resume_path).name, "mimeType": "application/pdf", "buffer": Path(resume_path).read_bytes()}
 
 # Questions asking for protected/voluntary self-identification data. These
 # are never answered by Gemini and never randomly filled -- the applicant's
@@ -461,7 +471,7 @@ def fill_application_form(page, profile: dict, resume_path: str | None, user_id:
 
                 if input_type == "file":
                     if resume_path:
-                        el.set_input_files(resume_path)
+                        el.set_input_files(_resume_payload(resume_path))
                         filled += 1
                     continue
 
@@ -586,8 +596,6 @@ def _handle_custom_dropdowns(page, frames, profile: dict, resume_path: str | Non
 
 AUTO_SUBMIT_WAIT_MS = int(os.getenv("AUTO_SUBMIT_WAIT_MS", str(90 * 1000)))
 MANUAL_SUBMIT_WAIT_MS = 20 * 60 * 1000
-# Default ON. AUTO_SUBMIT=false fills each form and waits for the candidate to click Submit.
-AUTO_SUBMIT = os.getenv("AUTO_SUBMIT", "true").lower() == "true"
 # How long to wait for the candidate to solve a CAPTCHA in the engine window.
 CAPTCHA_WAIT_S = int(os.getenv("CAPTCHA_WAIT_S", "180"))
 
@@ -744,9 +752,11 @@ def _click_submit_button(page) -> bool:
             return False
 
 
-def _wait_for_submission_result(page, start_url: str, timeout_ms: int) -> bool:
+def _wait_for_submission_result(page, start_url: str, timeout_ms: int, stop: Stop) -> bool:
     deadline = time.time() + timeout_ms / 1000
     while time.time() < deadline:
+        if stop():
+            raise Cancelled()
         try:
             if page.is_closed():
                 return False
@@ -758,10 +768,12 @@ def _wait_for_submission_result(page, start_url: str, timeout_ms: int) -> bool:
     return False
 
 
-def _wait_for_human_captcha(page, report: Report) -> bool:
-    report("Waiting for you to solve the CAPTCHA in the engine's browser window")
+def _wait_for_human_captcha(page, report: Report, stop: Stop) -> bool:
+    report("Waiting for you to solve the CAPTCHA in the live view")
     deadline = time.time() + CAPTCHA_WAIT_S
     while time.time() < deadline:
+        if stop():
+            raise Cancelled()
         if page.is_closed():
             return False
         if _captcha_appears_solved(page):
@@ -770,41 +782,82 @@ def _wait_for_human_captcha(page, report: Report) -> bool:
     return False
 
 
-def _open_browser_context(p):
-    """A local, visible Chromium. No extensions, no stealth, no CAPTCHA solving."""
+HYPERBROWSER_API_KEY = os.getenv("HYPERBROWSER_API_KEY", "").strip()
+
+
+@contextmanager
+def _browser_page(p, on_live: Callable[[str], None]) -> Iterator:
+    """A Hyperbrowser cloud session when HYPERBROWSER_API_KEY is set, else a local visible Chromium.
+
+    Never stealth, never automated CAPTCHA solving: the candidate solves
+    CAPTCHAs themselves in the live view.
+    """
+    if HYPERBROWSER_API_KEY:
+        from hyperbrowser import Hyperbrowser
+        from hyperbrowser.models import CreateSessionParams
+
+        client = Hyperbrowser(api_key=HYPERBROWSER_API_KEY)
+        session = client.sessions.create(
+            params=CreateSessionParams(use_stealth=False, use_ultra_stealth=False, solve_captchas=False, timeout_minutes=30)
+        )
+        try:
+            if session.live_url:
+                on_live(session.live_url)
+            browser = p.chromium.connect_over_cdp(session.ws_endpoint)
+            context = browser.contexts[0] if browser.contexts else browser.new_context()
+            yield context.pages[0] if context.pages else context.new_page()
+        finally:
+            try:
+                client.sessions.stop(session.id)
+            except Exception as e:
+                print(f"[Hyperbrowser] Couldn't stop session {session.id}: {e}")
+        return
+
     user_data = tempfile.mkdtemp(prefix="novajobs_pw_")
-    context = p.chromium.launch_persistent_context(
-        user_data_dir=user_data, headless=False, args=["--start-maximized"], no_viewport=True
-    )
-    page = context.pages[0] if context.pages else context.new_page()
-    return context, page, user_data
+    context = p.chromium.launch_persistent_context(user_data_dir=user_data, headless=False, args=["--start-maximized"], no_viewport=True)
+    try:
+        yield context.pages[0] if context.pages else context.new_page()
+    finally:
+        try:
+            context.close()
+        except Exception:
+            pass
+        shutil.rmtree(user_data, ignore_errors=True)
 
 
 Outcome = tuple[str, str]  # (applied | needs_review | failed, reason)
 
 
-def apply_to_job(job: dict, profile: dict, resume_path: str, user_id: str, report: Report) -> Outcome:
-    """Opens the posting, fills the form, submits, and confirms. Returns (status, reason)."""
+def apply_to_job(
+    job: dict, profile: dict, resume_path: str, user_id: str, auto_submit: bool,
+    report: Report, stop: Stop, on_live: Callable[[str], None],
+) -> Outcome:
+    """Opens the posting, fills the form, submits, and confirms. Returns (status, reason).
+
+    auto_submit is the candidate's own setting: off, the form is filled and the
+    candidate clicks Submit in the live view.
+
+    Raises Cancelled when the candidate pauses or cancels mid-run.
+    """
     url = job.get("postingUrl") or ""
     if not isinstance(url, str) or not url.strip():
         return "failed", "This job has no posting URL."
 
+    def step(message: str) -> None:
+        if stop():
+            raise Cancelled()
+        report(message)
+
     try:
-        with sync_playwright() as p:
-            context, page, user_data_dir = _open_browser_context(p)
-            try:
-                return _apply_in_page(page, url, profile, resume_path, user_id, report)
-            finally:
-                try:
-                    context.close()
-                except Exception:
-                    pass
-                shutil.rmtree(user_data_dir, ignore_errors=True)
+        with sync_playwright() as p, _browser_page(p, on_live) as page:
+            return _apply_in_page(page, url, profile, resume_path, user_id, auto_submit, step, stop)
+    except Cancelled:
+        raise
     except Exception as e:
         return "failed", f"The engine hit an error on the posting: {str(e).splitlines()[0][:160]}"
 
 
-def _apply_in_page(page, url: str, profile: dict, resume_path: str, user_id: str, report: Report) -> Outcome:
+def _apply_in_page(page, url: str, profile: dict, resume_path: str, user_id: str, auto_submit: bool, report: Report, stop: Stop) -> Outcome:
     report("Opening the posting")
     page.goto(url, timeout=45000, wait_until="domcontentloaded")
     page.wait_for_timeout(2000)
@@ -866,15 +919,15 @@ def _apply_in_page(page, url: str, profile: dict, resume_path: str, user_id: str
         return "failed", "The application form had no fields the engine could fill."
 
     start_url = page.url
-    if not AUTO_SUBMIT:
-        report("Form filled. Review it in the engine window and click Submit")
-        if _wait_for_submission_result(page, start_url, MANUAL_SUBMIT_WAIT_MS):
+    if not auto_submit:
+        report("Form filled. Review it in the live view and click Submit")
+        if _wait_for_submission_result(page, start_url, MANUAL_SUBMIT_WAIT_MS, stop):
             return "applied", ""
         return "needs_review", "Filled, but not submitted within 20 minutes of review."
 
     captcha = result.get("captcha")
     if captcha and not _captcha_appears_solved(page):
-        if not _wait_for_human_captcha(page, report):
+        if not _wait_for_human_captcha(page, report, stop):
             return "needs_review", f"{captcha} wasn't solved within {CAPTCHA_WAIT_S // 60} minutes. Finish this one on the posting."
 
     time.sleep(random.uniform(1.0, 2.5))
@@ -887,10 +940,10 @@ def _apply_in_page(page, url: str, profile: dict, resume_path: str, user_id: str
         if not _click_submit_button(page):
             return "needs_review", "Filled, but no Submit button was found on the form."
         wait_ms = min(25000, AUTO_SUBMIT_WAIT_MS) if attempt < 3 else AUTO_SUBMIT_WAIT_MS
-        if _wait_for_submission_result(page, start_url, wait_ms):
+        if _wait_for_submission_result(page, start_url, wait_ms, stop):
             return "applied", ""
         late = _detect_captcha(page)
-        if late and not _captcha_appears_solved(page) and not _wait_for_human_captcha(page, report):
+        if late and not _captcha_appears_solved(page) and not _wait_for_human_captcha(page, report, stop):
             return "needs_review", f"{late} appeared on submit and wasn't solved. Finish this one on the posting."
 
     return "needs_review", "Submitted, but the site never confirmed it. Check the posting before re-applying."

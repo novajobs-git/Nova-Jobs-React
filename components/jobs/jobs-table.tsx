@@ -4,7 +4,7 @@ import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { CompanyLogo, JobAction, MatchPill } from "@/components/jobs/job-parts"
+import { CompanyLogo, JobAction, MatchPill, RelaxedTags } from "@/components/jobs/job-parts"
 import type { Application } from "@/lib/applications/types"
 import type { Job } from "@/lib/jobs/types"
 
@@ -47,6 +47,7 @@ export function JobsTable({ jobs, applicationFor }: { jobs: Job[]; applicationFo
                   {job.company}
                   <span className="md:hidden"> · {job.location}</span>
                 </p>
+                <RelaxedTags relaxedBy={job.relaxedBy} className="mt-1" />
               </TableCell>
               <TableCell className="hidden text-[15px] whitespace-normal text-muted-foreground md:table-cell">{job.location}</TableCell>
               <TableCell className="hidden sm:table-cell">

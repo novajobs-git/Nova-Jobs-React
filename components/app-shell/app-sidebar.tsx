@@ -15,14 +15,13 @@ import {
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 
-// "Dashboard" is the matched-jobs landing page (user flow step 3).
+// Dashboard = application stats and history; Jobs = matched jobs (user flow step 3).
 const NAV = [
-  { href: "/jobs", label: "Dashboard" },
-  { href: null, label: "Jobs" },
-  { href: "/applications", label: "Applications" },
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/jobs", label: "Jobs" },
   { href: "/resume", label: "Resume Builder" },
   { href: "/resume-analysis", label: "Resume Analysis" },
-  { href: null, label: "Settings" },
+  { href: "/settings", label: "Settings" },
 ] as const
 
 const itemClass =
@@ -36,7 +35,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="offcanvas" className="border-r border-sidebar-border">
       <SidebarHeader className="px-6 pt-6 pb-5">
-        <Link href="/jobs" className="font-logo text-[32px] leading-none" aria-label="NovaJobs home">
+        <Link href="/dashboard" className="font-logo text-[32px] leading-none" aria-label="NovaJobs home">
           <span className="text-foreground">Nova</span>
           <span className="text-primary-hover">Jobs</span>
         </Link>
@@ -72,10 +71,14 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="mx-3.5 mb-3 gap-1 border-t border-sidebar-border px-0 pt-4">
-        <button type="button" onClick={soon("My Details")} className={cn(itemClass, "gap-2.5 text-[15px]")}>
+        <Link
+          href="/details"
+          aria-current={pathname === "/details" ? "page" : undefined}
+          className={cn(itemClass, "gap-2.5 text-[15px]", pathname === "/details" && "bg-sidebar-accent font-medium text-sidebar-accent-foreground")}
+        >
           <UserRoundIcon className="size-[18px]" aria-hidden />
           My Details
-        </button>
+        </Link>
         <button
           type="button"
           onClick={soon("Log out")}

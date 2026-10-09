@@ -5,6 +5,8 @@ import path from "node:path"
 import { z } from "zod"
 
 import { extractKeywords } from "@/lib/matching/extract"
+import { DEGREE_KEYS, TIER_KEYS } from "@/lib/matching/structured"
+import { normalizeTitle } from "@/lib/matching/titles"
 
 /*
  * The central job pool every candidate is matched against, written by
@@ -28,10 +30,18 @@ const scrapedJob = z.object({
   companyLogo: z.union([logoPath, z.url()]).nullish().catch(null),
   postedAt: z.string().nullable(),
   scrapedAt: z.string(),
+  // Extracted once at ingestion (scripts/extract_requirements.py, spec 014); absent until it has run.
+  seniorityLevel: z.enum(TIER_KEYS).nullish().catch(null),
+  minYearsExperience: z.number().int().nullish().catch(null),
+  degreeRequired: z.enum(DEGREE_KEYS).nullish().catch(null),
+  degreePreferred: z.enum(DEGREE_KEYS).nullish().catch(null),
+  salaryMin: z.number().nullish().catch(null),
+  salaryMax: z.number().nullish().catch(null),
+  titleNormalized: z.string().nullish(),
 })
 const poolFile = z.object({ jobs: z.array(scrapedJob) })
 
-export type PooledJob = z.infer<typeof scrapedJob> & { keywords: string[] }
+export type PooledJob = z.infer<typeof scrapedJob> & { titleNormalized: string; keywords: string[] }
 export interface Pool {
   /** Changes whenever a script rewrites the pool; stored matches older than this are recomputed. */
   version: number
@@ -54,7 +64,11 @@ export async function loadPool(): Promise<Pool | null> {
     const { jobs } = poolFile.parse(JSON.parse(await readFile(POOL_FILE, "utf8")))
     cache = {
       version,
-      jobs: jobs.map((j) => ({ ...j, keywords: extractKeywords(`${j.title}\n${j.description ?? ""}`) })),
+      jobs: jobs.map((j) => ({
+        ...j,
+        titleNormalized: j.titleNormalized ?? normalizeTitle(j.title),
+        keywords: extractKeywords(`${j.title}\n${j.description ?? ""}`),
+      })),
     }
   }
   return cache

@@ -27,6 +27,8 @@ class ScrapedJob:
     posted_at: str | None = None
     company_logo: str | None = None  # app path of the downloaded logo, /logos/<file>
     company_logo_source: str | None = None  # where it was downloaded from
+    job_family: str | None = None  # tech family (scripts/ats/job_family.py)
+    description: str | None = None  # filled when the board API returns it (scripts/ats/apis.py)
     scraped_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat(timespec="seconds"))
 
     @property
@@ -51,5 +53,7 @@ class ScrapedJob:
             "postedAt": d["posted_at"],
             "companyLogo": d["company_logo"],
             "companyLogoSource": d["company_logo_source"],
+            "jobFamily": d["job_family"],
+            **({"description": d["description"]} if d["description"] else {}),
             "scrapedAt": d["scraped_at"],
         }

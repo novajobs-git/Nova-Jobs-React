@@ -4,11 +4,11 @@ import { useState, useSyncExternalStore } from "react"
 import Link from "next/link"
 
 import { useApplications } from "@/components/applications/applications-provider"
+import { RelaxedNotice } from "@/components/jobs/job-parts"
 import { JobsTable } from "@/components/jobs/jobs-table"
 import { TopMatches } from "@/components/jobs/top-matches"
-import { DEMO_CANDIDATE } from "@/lib/applications/mock-data"
-import { cn } from "@/lib/utils"
 import type { Job } from "@/lib/jobs/types"
+import type { Relaxation } from "@/lib/matching/structured"
 
 const TOP_COUNT = 4
 
@@ -27,8 +27,8 @@ function useGreeting() {
   )
 }
 
-export function JobsView({ jobs, firstName }: { jobs: Job[]; firstName: string }) {
-  const { applications, autoApply } = useApplications()
+export function JobsView({ jobs, relaxed, firstName }: { jobs: Job[]; relaxed: Relaxation[]; firstName: string }) {
+  const { applications } = useApplications()
   const greeting = useGreeting()
   const byJob = new Map(applications.map((a) => [a.jobId, a]))
   const applicationFor = (job: Job) => byJob.get(job.id)
@@ -43,22 +43,10 @@ export function JobsView({ jobs, firstName }: { jobs: Job[]; firstName: string }
           <h1 className="text-[30px] leading-tight font-bold tracking-tight">
             {greeting}, {firstName}
           </h1>
-          <span className="mt-2 inline-flex rounded-none border border-primary/25 bg-primary/10 px-3 py-1 text-sm font-semibold text-primary-hover">
-            {DEMO_CANDIDATE.plan}
-          </span>
         </div>
         <div className="flex items-center gap-3">
-          <span
-            className={cn(
-              "inline-flex h-10 items-center gap-2 rounded-none border px-4 text-[15px] font-medium",
-              autoApply ? "border-success/25 bg-success/10 text-success-text" : "border-border bg-card text-muted-foreground",
-            )}
-          >
-            <span className={cn("size-2 rounded-none", autoApply ? "bg-success" : "bg-muted-foreground/50")} aria-hidden />
-            {autoApply ? "Auto-Apply active" : "Auto-Apply paused"}
-          </span>
           <Link
-            href="/applications"
+            href="/dashboard"
             className="inline-flex h-10 items-center rounded-none border bg-card px-4 text-[15px] font-medium text-foreground/75 transition-colors hover:text-foreground"
           >
             View analytics
@@ -67,6 +55,7 @@ export function JobsView({ jobs, firstName }: { jobs: Job[]; firstName: string }
       </header>
 
       <div className="flex min-w-0 flex-col gap-6">
+        {relaxed.length > 0 && <RelaxedNotice relaxed={relaxed} />}
         <TopMatches jobs={top} total={jobs.length} applicationFor={applicationFor} />
         <JobsTable jobs={jobs} applicationFor={applicationFor} />
       </div>

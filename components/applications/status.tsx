@@ -4,11 +4,12 @@ import {
   CircleDashedIcon,
   CircleXIcon,
   LoaderCircleIcon,
+  PauseCircleIcon,
   type LucideIcon,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import type { ApplicationStatus, Outcome } from "@/lib/applications/types"
+import type { ApplicationStatus } from "@/lib/applications/types"
 
 interface StatusMeta {
   label: string
@@ -23,15 +24,9 @@ export const STATUS_META: Record<ApplicationStatus, StatusMeta> = {
   applied: { label: "Applied", icon: CircleCheckIcon, text: "text-success-text", fill: "bg-success" },
   applying: { label: "Applying", icon: LoaderCircleIcon, text: "text-warning", fill: "bg-warning" },
   queued: { label: "Queued", icon: CircleDashedIcon, text: "text-primary", fill: "bg-primary" },
+  paused: { label: "Paused", icon: PauseCircleIcon, text: "text-muted-foreground", fill: "bg-muted-foreground" },
   needs_review: { label: "Needs review", icon: CircleAlertIcon, text: "text-destructive", fill: "bg-needs-review" },
   failed: { label: "Failed", icon: CircleXIcon, text: "text-destructive", fill: "bg-destructive" },
-}
-
-export const OUTCOME_META: Record<Outcome, StatusMeta> = {
-  applied: STATUS_META.applied,
-  in_queue: { ...STATUS_META.queued, label: "In queue" },
-  needs_review: STATUS_META.needs_review,
-  failed: STATUS_META.failed,
 }
 
 export function StatusLabel({ status, className }: { status: ApplicationStatus; className?: string }) {

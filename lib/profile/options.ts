@@ -36,6 +36,21 @@ export const WORK_MODES = ["Remote", "Hybrid", "On-site"] as const
 
 export const EXPERIENCE_YEARS = ["0–1", "1–3", "3–5", "5–8", "8–12", "12+"] as const
 
+/** Seniority tiers, lowest first (spec 014). Same order as TIERS in scripts/ats/requirements.py. */
+export const TARGET_LEVELS = ["New Grad", "Entry / Junior", "Mid Level", "Senior", "Staff", "VP"] as const
+
+/** The level a candidate is assumed to target until they pick one. */
+export const DEFAULT_LEVEL: Record<(typeof EXPERIENCE_YEARS)[number], (typeof TARGET_LEVELS)[number]> = {
+  "0–1": "New Grad",
+  "1–3": "Entry / Junior",
+  "3–5": "Mid Level",
+  "5–8": "Senior",
+  "8–12": "Staff",
+  "12+": "Staff",
+}
+
+export const HIGHEST_DEGREE = ["High school or none", "Associate", "Bachelor’s", "Master’s", "PhD"] as const
+
 /** EEO answers default to declining; the candidate opts in to sharing. */
 export const EEO_DEFAULTS = {
   gender: "Decline to self-identify",

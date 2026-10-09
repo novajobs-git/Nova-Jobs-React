@@ -5,7 +5,9 @@ import { mkdir, readFile, writeFile } from "node:fs/promises"
 import path from "node:path"
 import { connection } from "next/server"
 
+import { yearsFromResume } from "./resume"
 import type { OnboardingData } from "./schema"
+import { EXPERIENCE_YEARS } from "./options"
 
 /*
  * File-backed stand-in for the Supabase `profiles` table + `resumes`
@@ -29,6 +31,10 @@ export interface StoredProfile {
   portfolio_url: string
   job_title: string
   years_experience: string
+  /** Months of work in the resume's date ranges, clamped into the self-reported range (spec 014); null if none were found. */
+  years_experience_computed: number | null
+  target_level: string
+  highest_degree: string
   desired_salary: string
   earliest_start_date: string
   work_authorization: string
@@ -62,7 +68,33 @@ async function resumeText(resumeId: string): Promise<string> {
   return readFile(path.join(RESUME_DIR, `${resumeId}.txt`), "utf8")
 }
 
+/** [low, high] years for each self-reported range. */
+const YEAR_RANGES: Record<(typeof EXPERIENCE_YEARS)[number], [number, number]> = {
+  "0–1": [0, 1],
+  "1–3": [1, 3],
+  "3–5": [3, 5],
+  "5–8": [5, 8],
+  "8–12": [8, 12],
+  "12+": [12, 40],
+}
+
+// The candidate's own answer wins: the resume only places them within it.
+function computedYears(text: string, range: OnboardingData["yearsExperience"]): number | null {
+  const years = yearsFromResume(text)
+  if (years === null) return null
+  const [low, high] = YEAR_RANGES[range]
+  return Math.min(Math.max(years, low), high)
+}
+
+/** Years used for matching: the resume's figure, else the middle of the self-reported range. */
+export function candidateYears(p: StoredProfile): number {
+  if (typeof p.years_experience_computed === "number") return p.years_experience_computed
+  const range = YEAR_RANGES[p.years_experience as OnboardingData["yearsExperience"]]
+  return range ? (range[1] >= 40 ? range[0] : (range[0] + range[1]) / 2) : 0
+}
+
 export async function saveProfile(data: OnboardingData): Promise<StoredProfile> {
+  const text = await resumeText(data.resumeId)
   const profile: StoredProfile = {
     full_name: `${data.firstName} ${data.lastName}`.trim(),
     first_name: data.firstName,
@@ -75,6 +107,9 @@ export async function saveProfile(data: OnboardingData): Promise<StoredProfile> 
     portfolio_url: data.portfolioUrl,
     job_title: data.currentTitle,
     years_experience: data.yearsExperience,
+    years_experience_computed: computedYears(text, data.yearsExperience),
+    target_level: data.targetLevel,
+    highest_degree: data.highestDegree,
     desired_salary: data.desiredSalary,
     earliest_start_date: data.earliestStartDate,
     work_authorization: data.workAuthorization,
@@ -89,7 +124,7 @@ export async function saveProfile(data: OnboardingData): Promise<StoredProfile> 
     resume_pdf: `resumes/${data.resumeId}.pdf`,
     resume_filename: data.resumeFileName,
     resume_skills: data.skills,
-    resume_text: await resumeText(data.resumeId),
+    resume_text: text,
     onboarding_complete: true,
     updated_at: new Date().toISOString(),
   }

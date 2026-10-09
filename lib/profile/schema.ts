@@ -4,7 +4,9 @@ import {
   DISABILITY_STATUS,
   EXPERIENCE_YEARS,
   GENDER,
+  HIGHEST_DEGREE,
   RACE_ETHNICITY,
+  TARGET_LEVELS,
   VETERAN_STATUS,
   WORK_MODES,
   YES_NO,
@@ -36,6 +38,8 @@ export const stepSchemas = {
     workModes: z.array(z.enum(WORK_MODES)).min(1, "Pick at least one"),
     currentTitle: z.string().trim(),
     yearsExperience: z.enum(EXPERIENCE_YEARS, "Pick one"),
+    targetLevel: z.enum(TARGET_LEVELS, "Pick one"),
+    highestDegree: z.enum(HIGHEST_DEGREE, "Pick one"),
     desiredSalary: z.string().trim(),
     earliestStartDate: z.string().trim(),
   }),
@@ -71,6 +75,8 @@ export interface ParsedResume {
   resumeId: string
   fileName: string
   skills: string[]
+  /** Best guess from the resume's education section; the candidate confirms it. */
+  highestDegree?: (typeof HIGHEST_DEGREE)[number]
   contact: {
     firstName?: string
     lastName?: string
